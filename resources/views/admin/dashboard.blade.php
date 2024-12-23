@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-lg-12 mb-2 order-0">
             <div class="card">
-                <div class="col-lg-12 mb-2 order-0 dashboard-marquee">
+                <div class="col-lg-12 my-2 px-2 order-0 dashboard-marquee">
                     <marquee behavior="scroll" direction="left" scrollamount="6">
                         <label class="text-danger">Last Issue Diagnosed: {{ $lastDiagnosedDiseaseName }}, at
                             {{ $lastDiagnosedDiseaseAtlocation }}, {{ $lastDiagnosedDiseaseAtDistrict }} on

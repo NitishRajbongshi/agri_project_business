@@ -34,6 +34,7 @@ use App\Http\Controllers\QueryHandler\QueryController;
 use App\Http\Controllers\UtilsController;
 use App\Models\AgriNews\AgriNewsCategory;
 use App\Http\Controllers\MIS\ReportController;
+use App\Http\Controllers\Order\UserOrderController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 /*
@@ -152,6 +153,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::post('office', [OfficeController::class, 'createOffice'])->name('admin.office_post');
     Route::post('office/edit', [OfficeController::class, 'editOffice'])->name('admin.office.edit');
 
+    // admin/user order
+    Route::get("user/order-details", [UserOrderController::class, 'index'])->name('admin.user.order');
 });
 
 
