@@ -174,48 +174,35 @@ body {
               <label for="email" class="form-label">Email or Username</label>
               <input type="text" class="form-control @error('email') is-invalid @enderror" id="email" name="email" placeholder="Enter your email" autofocus/>
               @error('email')
-    <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
+    <div class="invalid-feedback">{{ $message }}</div>
 @enderror
             </div>
-
-
             <div class="login_password_input">
               <label class="form-label" for="password">Password</label>
               <input type="password" id="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Password" aria-describedby="password"/>
               @error('password')
-    <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
+    <div class="invalid-feedback">{{ $message }}</div>
 @enderror
             </div>
-
-
             <div class="show_password">
                 <input type="checkbox" id="showPasswordCheckbox" onchange="togglePasswordVisibility()">
                     Show Password
             </div>
-
-
             <div class="login_button">
                 <button class="btn login_button" type="submit">Login</button>
             </div>
     </form>
+    </div>
 
-
+    
+</body>
     <script src="{{ asset('admin_assets/vendor/libs/jquery/jquery.js') }}"></script>
     <script src="{{ asset('admin_assets/vendor/libs/popper/popper.js') }}"></script>
     <script src="{{ asset('admin_assets/vendor/js/bootstrap.js') }}"></script>
     <script src="{{ asset('admin_assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
-
     <script src="{{ asset('admin_assets/vendor/js/menu.js') }}"></script>
-
     <script src="{{ asset('admin_assets/js/main.js') }}"></script>
-
-
     <script async defer src="https://buttons.github.io/buttons.js"></script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             function togglePasswordVisibility() {
@@ -227,6 +214,4 @@ body {
             document.getElementById("showPasswordCheckbox").addEventListener("change", togglePasswordVisibility);
         });
     </script>
-
-</body>
 </html>

@@ -40,9 +40,14 @@
             </div>
         </div>
     </div>
-    <div class="card">
-        <div class="d-flex align-items-center">
+    <div class="card my-2">
+        <div class="d-flex align-items-between justify-content-between">
             <h5 class="card-header">User Order Details</h5>
+            <div class="me-2 mt-2">
+                <a href="#weeklyReport" class="text-decoration-underline">
+                    Weekly Report
+                </a>
+            </div>
         </div>
         <div class="table-responsive text-nowrap px-4 pb-2">
             <table class="table" id="tblUser">
@@ -82,7 +87,8 @@
                             </td>
                             <td style="overflow-wrap: break-word; white-space: normal;">
                                 {{ $item->is_delivered == 'Y' ? 'Delivered' : 'Pending' }}</td>
-                            <td style="display: none; overflow-wrap: break-word; white-space: normal;">{{ $item->booking_ref_no }}</td>
+                            <td style="display: none; overflow-wrap: break-word; white-space: normal;">
+                                {{ $item->booking_ref_no }}</td>
                             <td>
                                 <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
                                     data-bs-target="#editModal" data-booking-id="{{ $item->booking_ref_no }}"
@@ -92,12 +98,42 @@
                             </td>
                         </tr>
                     @endforeach
-
                 </tbody>
             </table>
         </div>
     </div>
-
+    <div class="card">
+        <div id="weeklyReport">
+            <h5 class="card-header">
+                Item Report <br>
+                <span class="text-sm text-secondary">Listing all the ordered items between <span class="text-primary"> {{ $start }}</span> (Monday) to
+                <span class="text-primary">{{ $today }}</span> (Present Day).</span>
+            </h5>
+        </div>
+        <div class="table-responsive text-nowrap px-4 pb-2">
+            <table class="table" id="itemsTable">
+                <thead>
+                    <tr>
+                        <th scope="col">SL. No.</th>
+                        <th scope="col">ITEM NAME</th>
+                        <th scope="col">ITEM COUNT</th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    @php
+                        $serialNumber = 1; // Initialize serial number counter
+                    @endphp
+                    @foreach ($itemCounts as $item)
+                        <tr>
+                            <td>{{ $serialNumber++ }}</td>
+                            <td>{{ $item->item_name }}</td>
+                            <td>{{ $item->total_quantity }} Unit(s)</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -149,13 +185,14 @@
 
         $(document).ready(function() {
             $('#tblUser').DataTable();
+            $('#itemsTable').DataTable();
 
             $('#editModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var bookingID = button.data('booking-id');
                 var customerName = button.data('customer-name');
                 console.log(customerName);
-                
+
                 // var email = button.data('email');
                 // var address = button.data('address');
                 // var roles = button.data('roles').split(',').map(role => role.trim());
