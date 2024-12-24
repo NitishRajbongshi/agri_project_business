@@ -14,21 +14,22 @@ class UserOrderController extends Controller
         // Row query for futher use
 
         // SELECT
-        // 	smartag_market.tbl_customer_booking_details.cust_id,
-        // 	smartag_market.tbl_customer_booking_details.order_date,
-        //     smartag_market.tbl_customer_booking_details.booking_ref_no, 
-        // 	smartag_market.tbl_customer_booking_details.order_date,
-        // 	smartag_market.tbl_customer_booking_details.is_delivered,
-        // 	smartag_market.tbl_user_login.full_name,
-        //     smartag_market.tbl_user_login.phone_no,
-        // 	smartag_market.tbl_user_address.address_line1,
-        //     JSON_AGG(
+        // 	    smartag_market.tbl_customer_booking_details.cust_id,
+        // 	    smartag_market.tbl_customer_booking_details.order_date,
+        //      smartag_market.tbl_customer_booking_details.booking_ref_no, 
+        // 	    smartag_market.tbl_customer_booking_details.order_date,
+        // 	    smartag_market.tbl_customer_booking_details.is_delivered,
+        // 	    smartag_market.tbl_user_login.full_name,
+        //      smartag_market.tbl_user_login.phone_no,
+        // 	    smartag_market.tbl_user_address.address_line1,
+        //      JSON_AGG(
         //         JSON_BUILD_OBJECT(
         //             'item_cd', smartag_market.tbl_customer_booking_details.item_cd,
         //             'item_name', smartag_market.tbl_item_master.item_name,
+        //             'item_unit', smartag_market.tbl_item_master.unit_min_order_qty,
         //             'item_quantity', smartag_market.tbl_customer_booking_details.item_quantity
         //         )
-        //     ) AS order_items
+        //      ) AS order_items
         // FROM 
         //     smartag_market.tbl_customer_booking_details
         // LEFT JOIN
@@ -42,28 +43,30 @@ class UserOrderController extends Controller
         //     smartag_market.tbl_customer_booking_details.item_cd = smartag_market.tbl_item_master.item_cd
         // WHERE smartag_market.tbl_customer_booking_details.booking_ref_no = '600239075420240229100856195266'
         // GROUP BY 
-        // 	smartag_market.tbl_customer_booking_details.cust_id,
-        // 	smartag_market.tbl_customer_booking_details.order_date,
-        //     smartag_market.tbl_customer_booking_details.booking_ref_no,
-        // 	smartag_market.tbl_customer_booking_details.order_date,
-        // 	smartag_market.tbl_customer_booking_details.is_delivered,
-        // 	smartag_market.tbl_user_login.full_name,
-        //     smartag_market.tbl_user_login.phone_no,
-        // 	smartag_market.tbl_user_address.address_line1;
+        // 	    smartag_market.tbl_customer_booking_details.cust_id,
+        // 	    smartag_market.tbl_customer_booking_details.order_date,
+        //      smartag_market.tbl_customer_booking_details.booking_ref_no,
+        // 	    smartag_market.tbl_customer_booking_details.order_date,
+        // 	    smartag_market.tbl_customer_booking_details.is_delivered,
+        // 	    smartag_market.tbl_user_login.full_name,
+        //      smartag_market.tbl_user_login.phone_no,
+        // 	    smartag_market.tbl_user_address.address_line1;
 
-        //  SELECT 
+        // SELECT 
         //     smartag_market.tbl_customer_booking_details.item_cd, 
-        // 	smartag_market.tbl_item_master.item_name,
+        // 	   smartag_market.tbl_item_master.item_name,
+        //     smartag_market.tbl_item_master.unit_min_order_qty,
         //     SUM(smartag_market.tbl_customer_booking_details.item_quantity) AS total_quantity
         // FROM 
         //     smartag_market.tbl_customer_booking_details
         // LEFT JOIN
-        // 	smartag_market.tbl_item_master
+        // 	   smartag_market.tbl_item_master
         // ON
-        // 	smartag_market.tbl_customer_booking_details.item_cd = smartag_market.tbl_item_master.item_cd
+        // 	   smartag_market.tbl_customer_booking_details.item_cd = smartag_market.tbl_item_master.item_cd
         // GROUP BY 
         //     smartag_market.tbl_customer_booking_details.item_cd,
-        // 	smartag_market.tbl_item_master.item_name;
+        // 	   smartag_market.tbl_item_master.item_name,
+        //     smartag_market.tbl_item_master.unit_min_order_qty;
 
 
         // get the neccessary dates
@@ -100,6 +103,7 @@ class UserOrderController extends Controller
                 JSON_BUILD_OBJECT(
                     'item_cd', smartag_market.tbl_customer_booking_details.item_cd,
                     'item_name', smartag_market.tbl_item_master.item_name,
+                    'item_unit', smartag_market.tbl_item_master.unit_min_order_qty,
                     'item_quantity', smartag_market.tbl_customer_booking_details.item_quantity
                 )
             ) AS order_items")
@@ -116,12 +120,12 @@ class UserOrderController extends Controller
             )
             ->orderBy('smartag_market.tbl_customer_booking_details.order_date', 'desc')
             ->get();
-        // dd($data);
 
         $itemCounts = DB::table('smartag_market.tbl_customer_booking_details')
             ->select(
                 'smartag_market.tbl_customer_booking_details.item_cd',
                 'smartag_market.tbl_item_master.item_name',
+                'smartag_market.tbl_item_master.unit_min_order_qty',
                 DB::raw('SUM(smartag_market.tbl_customer_booking_details.item_quantity) AS total_quantity')
             )
             ->leftJoin(
@@ -132,11 +136,11 @@ class UserOrderController extends Controller
             )
             ->groupBy(
                 'smartag_market.tbl_customer_booking_details.item_cd',
-                'smartag_market.tbl_item_master.item_name'
+                'smartag_market.tbl_item_master.item_name',
+                'smartag_market.tbl_item_master.unit_min_order_qty'
             )
             ->whereBetween(DB::raw('DATE(smartag_market.tbl_customer_booking_details.order_date)'), [$start, $today])
             ->get();
-        // dd($itemCounts);
 
         $roles = DB::table('roles')
             ->pluck('role_title', 'role_title');

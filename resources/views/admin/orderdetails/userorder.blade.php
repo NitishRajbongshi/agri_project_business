@@ -41,11 +41,19 @@
         </div>
     </div>
     <div class="card my-2">
-        <div class="d-flex align-items-between justify-content-between">
-            <h5 class="card-header">User Order Details</h5>
-            <div class="me-2 mt-2">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+            <h5>User Order Details
+                <br>
+                <span class="text-sm text-secondary">Listing all the items between <span class="text-primary">
+                        {{ $start }}</span> (Monday) to
+                    <span class="text-primary">{{ $today }}</span> (Present Day).</span>
+            </h5>
+            <div class="">
                 <a href="#weeklyReport" class="text-decoration-underline">
                     Weekly Report
+                </a>
+                <a href="#" class="text-decoration-underline ms-3">
+                    Order History
                 </a>
             </div>
         </div>
@@ -61,7 +69,7 @@
                         <th>Item + Quantity</th>
                         <th>Order Status</th>
                         <th style="display: none;">Order Info</th>
-                        <th>Action</th>
+                        <th>Delivery Status</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -81,7 +89,10 @@
                                         $ordered_items = json_decode($item->order_items, true);
                                     @endphp
                                     @foreach ($ordered_items as $ordered_item)
-                                        <li>{{ $ordered_item['item_name'] }}: {{ $ordered_item['item_quantity'] }}</li>
+                                        <li>{{ $ordered_item['item_name'] }}:
+                                            <span style="font-weight: bold;">{{ $ordered_item['item_quantity'] }}</span>
+                                            {{ $ordered_item['item_unit'] }}
+                                        </li>
                                     @endforeach
                                 </ol>
                             </td>
@@ -93,7 +104,7 @@
                                 <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
                                     data-bs-target="#editModal" data-booking-id="{{ $item->booking_ref_no }}"
                                     data-customer-name="{{ $item->full_name }}">
-                                    <i class="tf-icons bx bx-edit"></i> Edit
+                                    <i class="tf-icons bx bx-edit"></i> Update
                                 </a>
                             </td>
                         </tr>
@@ -106,17 +117,19 @@
         <div id="weeklyReport">
             <h5 class="card-header">
                 Item Report <br>
-                <span class="text-sm text-secondary">Listing all the ordered items between <span class="text-primary"> {{ $start }}</span> (Monday) to
-                <span class="text-primary">{{ $today }}</span> (Present Day).</span>
+                <span class="text-sm text-secondary">Listing all the ordered items between <span class="text-primary">
+                        {{ $start }}</span> (Monday) to
+                    <span class="text-primary">{{ $today }}</span> (Present Day).</span>
             </h5>
         </div>
         <div class="table-responsive text-nowrap px-4 pb-2">
             <table class="table" id="itemsTable">
                 <thead>
-                    <tr>
+                    <tr class="text-center">
                         <th scope="col">SL. No.</th>
-                        <th scope="col">ITEM NAME</th>
+                        <th scope="col" class="text-start">ITEM NAME</th>
                         <th scope="col">ITEM COUNT</th>
+                        <th scope="col">ITEM UNIT</th>
                     </tr>
                 </thead>
                 <tbody class="">
@@ -124,10 +137,11 @@
                         $serialNumber = 1; // Initialize serial number counter
                     @endphp
                     @foreach ($itemCounts as $item)
-                        <tr>
+                        <tr class="text-center">
                             <td>{{ $serialNumber++ }}</td>
-                            <td>{{ $item->item_name }}</td>
-                            <td>{{ $item->total_quantity }} Unit(s)</td>
+                            <td class="text-start">{{ $item->item_name }}</td>
+                            <td>{{ $item->total_quantity }}</td>
+                            <td>{{ $item->unit_min_order_qty }}</td>
                         </tr>
                     @endforeach
                 </tbody>
