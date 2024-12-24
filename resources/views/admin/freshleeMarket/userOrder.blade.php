@@ -48,13 +48,20 @@
                         {{ $start }}</span> (Monday) to
                     <span class="text-primary">{{ $today }}</span> (Present Day).</span>
             </h5>
-            <div class="">
-                <a href="#weeklyReport" class="text-decoration-underline">
-                    Weekly Report
-                </a>
-                <a href="#" class="text-decoration-underline ms-3">
-                    Order History
-                </a>
+            <div class="d-flex align-items-center">
+                <div>
+                    <a href="#report" class="text-decoration-underline">
+                        Weekly Report
+                    </a>
+                </div>
+                <form action="{{route("admin.order.history")}}" method="POST">
+                    @csrf
+                    <input type="hidden" name="start_date" value="{{ $first }}">
+                    <input type="hidden" name="end_date" value="{{ $today }}">
+                    <button type="submit" class="btn btn-md btn-outline-none text-danger text-decoration-underline">
+                        Order History
+                    </button>
+                </form>
             </div>
         </div>
         <div class="table-responsive text-nowrap px-4 pb-2">
@@ -83,7 +90,7 @@
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->phone_no }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->address_line1 }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->order_date }}</td>
-                            <td style="overflow-wrap: break-word; white-space: normal;">
+                            <td style="overflow-wrap: break-word; text-align: left;">
                                 <ol>
                                     @php
                                         $ordered_items = json_decode($item->order_items, true);
@@ -114,7 +121,7 @@
         </div>
     </div>
     <div class="card">
-        <div id="weeklyReport">
+        <div id="report">
             <h5 class="card-header">
                 Item Report <br>
                 <span class="text-sm text-secondary">Listing all the ordered items between <span class="text-primary">

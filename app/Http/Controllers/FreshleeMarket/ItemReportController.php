@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Order;
+namespace App\Http\Controllers\FreshleeMarket;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class UserOrderController extends Controller
+class ItemReportController extends Controller
 {
     public function index()
     {
@@ -71,7 +71,8 @@ class UserOrderController extends Controller
 
         // get the neccessary dates
         $today = Carbon::today()->toDateString();;
-        $start = Carbon::now()->startOfWeek(Carbon::MONDAY)->toDateString();;
+        $start = Carbon::now()->startOfWeek(Carbon::MONDAY)->toDateString();
+        $first = Carbon::now()->startOfMonth()->toDateString();
         $data = DB::table('smartag_market.tbl_customer_booking_details')
             ->leftJoin(
                 'smartag_market.tbl_user_login',
@@ -93,7 +94,7 @@ class UserOrderController extends Controller
             )
             ->select(
                 'smartag_market.tbl_customer_booking_details.cust_id',
-                'smartag_market.tbl_customer_booking_details.order_date',
+                DB::raw('DATE(smartag_market.tbl_customer_booking_details.order_date) as order_date'),
                 'smartag_market.tbl_customer_booking_details.booking_ref_no',
                 'smartag_market.tbl_customer_booking_details.is_delivered',
                 'smartag_market.tbl_user_login.full_name',
@@ -142,20 +143,79 @@ class UserOrderController extends Controller
             ->whereBetween(DB::raw('DATE(smartag_market.tbl_customer_booking_details.order_date)'), [$start, $today])
             ->get();
 
-        $roles = DB::table('roles')
-            ->pluck('role_title', 'role_title');
         $picupAddress = DB::table("smartag_market.tbl_default_delivery_address")
             ->select('address_line1', 'address_line2', 'state_cd', 'district_cd', 'pin_code', 'latitude', 'longitude')
             ->get()
             ->first();
 
-        return view('admin.orderdetails.userorder', [
-            'roles' => $roles,
+        return view('admin.freshleeMarket.userOrder', [
             'data' => $data,
             'start' => $start,
+            'first' => $first,
             'today' => $today,
             'picupAddress' => $picupAddress,
             'itemCounts' => $itemCounts
+        ]);
+    }
+
+    public function history(Request $request)
+    {
+        // dd($request->all());
+        $start = $request->start_date;
+        $today = $request->end_date;
+        $data = DB::table('smartag_market.tbl_customer_booking_details')
+            ->leftJoin(
+                'smartag_market.tbl_user_login',
+                'smartag_market.tbl_customer_booking_details.cust_id',
+                '=',
+                'smartag_market.tbl_user_login.user_id'
+            )
+            ->leftJoin(
+                'smartag_market.tbl_user_address',
+                'smartag_market.tbl_customer_booking_details.delivery_address_cd',
+                '=',
+                'smartag_market.tbl_user_address.address_cd'
+            )
+            ->leftJoin(
+                'smartag_market.tbl_item_master',
+                'smartag_market.tbl_customer_booking_details.item_cd',
+                '=',
+                'smartag_market.tbl_item_master.item_cd'
+            )
+            ->select(
+                'smartag_market.tbl_customer_booking_details.cust_id',
+                DB::raw('DATE(smartag_market.tbl_customer_booking_details.order_date) as order_date'),
+                'smartag_market.tbl_customer_booking_details.booking_ref_no',
+                'smartag_market.tbl_customer_booking_details.is_delivered',
+                'smartag_market.tbl_user_login.full_name',
+                'smartag_market.tbl_user_login.phone_no',
+                'smartag_market.tbl_user_address.address_line1',
+                DB::raw("JSON_AGG(
+                JSON_BUILD_OBJECT(
+                    'item_cd', smartag_market.tbl_customer_booking_details.item_cd,
+                    'item_name', smartag_market.tbl_item_master.item_name,
+                    'item_unit', smartag_market.tbl_item_master.unit_min_order_qty,
+                    'item_quantity', smartag_market.tbl_customer_booking_details.item_quantity
+                )
+            ) AS order_items")
+            )
+            ->whereBetween(DB::raw('DATE(smartag_market.tbl_customer_booking_details.order_date)'), [$start, $today])
+            ->groupBy(
+                'smartag_market.tbl_customer_booking_details.cust_id',
+                'smartag_market.tbl_customer_booking_details.order_date',
+                'smartag_market.tbl_customer_booking_details.booking_ref_no',
+                'smartag_market.tbl_customer_booking_details.is_delivered',
+                'smartag_market.tbl_user_login.full_name',
+                'smartag_market.tbl_user_login.phone_no',
+                'smartag_market.tbl_user_address.address_line1'
+            )
+            ->orderBy('smartag_market.tbl_customer_booking_details.order_date', 'desc')
+            ->get();
+        // dd($data);
+        return view('admin.freshleeMarket.orderHistory', [
+            'data' => $data,
+            'first' => $start,
+            'today' => $today
         ]);
     }
 }

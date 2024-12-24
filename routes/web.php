@@ -28,6 +28,7 @@ use App\Http\Controllers\ApplicationMaster\CropInformationController;
 use App\Http\Controllers\ApplicationMaster\SuitabilityController;
 use App\Http\Controllers\ApplicationMaster\SymptomController;
 use App\Http\Controllers\ApplicationMaster\RecommendationController;
+use App\Http\Controllers\FreshleeMarket\ItemReportController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\QueryHandler\QueryCategoryController;
 use App\Http\Controllers\QueryHandler\QueryController;
@@ -154,7 +155,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::post('office/edit', [OfficeController::class, 'editOffice'])->name('admin.office.edit');
 
     // admin/user order
-    Route::get("user/order-details", [UserOrderController::class, 'index'])->name('admin.user.order');
+    Route::get("user/order-reports", [ItemReportController::class, 'index'])->name('admin.user.order');
+    Route::post("user/order-history", [ItemReportController::class, 'history'])->name('admin.order.history');
 });
 
 
