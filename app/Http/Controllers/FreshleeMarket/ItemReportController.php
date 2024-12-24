@@ -5,6 +5,7 @@ namespace App\Http\Controllers\FreshleeMarket;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ItemReportController extends Controller
@@ -70,6 +71,7 @@ class ItemReportController extends Controller
 
 
         // get the neccessary dates
+        $user = Auth::user();
         $today = Carbon::today()->toDateString();;
         $start = Carbon::now()->startOfWeek(Carbon::MONDAY)->toDateString();
         $first = Carbon::now()->startOfMonth()->toDateString();
@@ -97,6 +99,7 @@ class ItemReportController extends Controller
                 DB::raw('DATE(smartag_market.tbl_customer_booking_details.order_date) as order_date'),
                 'smartag_market.tbl_customer_booking_details.booking_ref_no',
                 'smartag_market.tbl_customer_booking_details.is_delivered',
+                DB::raw('DATE(smartag_market.tbl_customer_booking_details.delivered_at) as delivered_at'),
                 'smartag_market.tbl_user_login.full_name',
                 'smartag_market.tbl_user_login.phone_no',
                 'smartag_market.tbl_user_address.address_line1',
@@ -115,12 +118,14 @@ class ItemReportController extends Controller
                 'smartag_market.tbl_customer_booking_details.order_date',
                 'smartag_market.tbl_customer_booking_details.booking_ref_no',
                 'smartag_market.tbl_customer_booking_details.is_delivered',
+                'smartag_market.tbl_customer_booking_details.delivered_at',
                 'smartag_market.tbl_user_login.full_name',
                 'smartag_market.tbl_user_login.phone_no',
                 'smartag_market.tbl_user_address.address_line1'
             )
             ->orderBy('smartag_market.tbl_customer_booking_details.order_date', 'desc')
             ->get();
+        // dd($data);
 
         $itemCounts = DB::table('smartag_market.tbl_customer_booking_details')
             ->select(
@@ -149,6 +154,7 @@ class ItemReportController extends Controller
             ->first();
 
         return view('admin.freshleeMarket.userOrder', [
+            'user' => $user,
             'data' => $data,
             'start' => $start,
             'first' => $first,
@@ -156,6 +162,19 @@ class ItemReportController extends Controller
             'picupAddress' => $picupAddress,
             'itemCounts' => $itemCounts
         ]);
+    }
+
+    public function updateDeliveryStatus(Request $request)
+    {
+        // dd($request->all());
+        $data = DB::table('smartag_market.tbl_customer_booking_details')
+            ->where('booking_ref_no', $request->booking_ref_no)
+            ->update([
+                'is_delivered' => $request->delivery_status,
+                'delivered_at' => $request->update_date,
+                'delivered_by' => Auth::user()->user_id,
+            ]);
+        return redirect()->back()->with('success', 'Delivery status updated successfully.');
     }
 
     public function history(Request $request)

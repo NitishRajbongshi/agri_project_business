@@ -155,8 +155,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::post('office/edit', [OfficeController::class, 'editOffice'])->name('admin.office.edit');
 
     // admin/user order
-    Route::get("user/order-reports", [ItemReportController::class, 'index'])->name('admin.user.order');
-    Route::post("user/order-history", [ItemReportController::class, 'history'])->name('admin.order.history');
+    Route::get("order/reports", [ItemReportController::class, 'index'])->name('admin.user.order');
+    Route::post("order/delivery/update", [ItemReportController::class, 'updateDeliveryStatus'])->name('admin.order.delivery.update');
+    Route::post("order/history", [ItemReportController::class, 'history'])->name('admin.order.history');
 });
 
 

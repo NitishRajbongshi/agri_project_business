@@ -54,7 +54,7 @@
                         Weekly Report
                     </a>
                 </div>
-                <form action="{{route("admin.order.history")}}" method="POST">
+                <form action="{{ route('admin.order.history') }}" method="POST">
                     @csrf
                     <input type="hidden" name="start_date" value="{{ $first }}">
                     <input type="hidden" name="end_date" value="{{ $today }}">
@@ -110,7 +110,9 @@
                             <td>
                                 <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
                                     data-bs-target="#editModal" data-booking-id="{{ $item->booking_ref_no }}"
-                                    data-customer-name="{{ $item->full_name }}">
+                                    data-customer-name="{{ $item->full_name }}"
+                                    data-delivery-status="{{ $item->is_delivered }}"
+                                    data-delivery-at="{{ $item->delivered_at != null ? $item->delivered_at : $today }}">
                                     <i class="tf-icons bx bx-edit"></i> Update
                                 </a>
                             </td>
@@ -141,7 +143,7 @@
                 </thead>
                 <tbody class="">
                     @php
-                        $serialNumber = 1; // Initialize serial number counter
+                        $serialNumber = 1;
                     @endphp
                     @foreach ($itemCounts as $item)
                         <tr class="text-center">
@@ -162,8 +164,7 @@
                     <h5 class="modal-title" id="editModalLabel">Update Delivery Status</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('admin.usermanagement.usermanagement.updateUserRoles') }}" method="POST"
-                    autocomplete="off">
+                <form action="{{ route('admin.order.delivery.update') }}" method="POST" autocomplete="off">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -172,14 +173,22 @@
                         <div class="mb-3">
                             <p><strong>Customer:</strong> <span id="customer_name_edit" class="fw-bold"></span></p>
                         </div>
-                        {{-- <div class="mb-3">
-                            <p><strong>Address:</strong> <span id="modalAddress" class="fw-bold"></span></p>
-                        </div> --}}
-
-                        {{-- <input type="hidden" name="user_id" id="userId"> --}}
+                        <input type="hidden" name="user_id" id="userId" value="{{ $user->id }}">
+                        <input type="hidden" name="booking_ref_no" id="booking_ref_no" value="">
+                        <div class="mb-3">
+                            <label for="delivery_status" class="form-label fw-bold">Delivery Status</label>
+                            <select class="form-select" name="delivery_status" id="delivery_status" required>
+                                <option value="Y">Delivered</option>
+                                <option value="N">Pending</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" style="display: none;" id="delivery_date">
+                            <label for="update_date" class="form-label fw-bold">Delivery Date</label>
+                            <input class="form-control" type="date" name="update_date" id="update_date" required>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
                         <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>
@@ -212,28 +221,29 @@
                 var button = $(event.relatedTarget);
                 var bookingID = button.data('booking-id');
                 var customerName = button.data('customer-name');
-                console.log(customerName);
-
-                // var email = button.data('email');
-                // var address = button.data('address');
-                // var roles = button.data('roles').split(',').map(role => role.trim());
-
+                var deliveryStatus = button.data('delivery-status');
+                var deliveryAt = button.data('delivery-at');
+                console.log(deliveryAt);
                 var modal = $(this);
                 modal.find('#book_id_edit').text(bookingID);
                 modal.find('#customer_name_edit').text(customerName);
-                // modal.find('#modalEmail').text(email);
-                // modal.find('#modalAddress').text(address);
+                modal.find('#booking_ref_no').val(bookingID);
+                modal.find('#delivery_status').val(deliveryStatus);
+                modal.find('#update_date').val(deliveryAt);
+                if (deliveryStatus == 'Y') {
+                    $('#delivery_date').show();
+                } else {
+                    $('#delivery_date').hide();
+                }
+            });
 
-                // // Ensure Role F is always checked
-                // modal.find('input[type="checkbox"]').prop('checked', false);
-                // modal.find('input[type="checkbox"][disabled]').prop('checked', true);
-
-                // roles.forEach(function(role) {
-                //     var checkbox = modal.find('#role_' + role);
-                //     if (checkbox.length) {
-                //         checkbox.prop('checked', true);
-                //     }
-                // });
+            $('#delivery_status').on('change', function() {
+                var deliveryStatus = $(this).val();
+                if (deliveryStatus == 'Y') {
+                    $('#delivery_date').show();
+                } else {
+                    $('#delivery_date').hide();
+                }
             });
         });
     </script>
