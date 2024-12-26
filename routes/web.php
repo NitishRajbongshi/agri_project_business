@@ -29,6 +29,7 @@ use App\Http\Controllers\ApplicationMaster\SuitabilityController;
 use App\Http\Controllers\ApplicationMaster\SymptomController;
 use App\Http\Controllers\ApplicationMaster\RecommendationController;
 use App\Http\Controllers\FreshleeMarket\ItemReportController;
+use App\Http\Controllers\FreshleeMaster\ItemController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\QueryHandler\QueryCategoryController;
 use App\Http\Controllers\QueryHandler\QueryController;
@@ -158,6 +159,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get("order/reports", [ItemReportController::class, 'index'])->name('admin.user.order');
     Route::post("order/delivery/update", [ItemReportController::class, 'updateDeliveryStatus'])->name('admin.order.delivery.update');
     Route::post("order/history", [ItemReportController::class, 'history'])->name('admin.order.history');
+
+    // admin/freshlee-master
+    Route::get('freshlee/master/items', [ItemController::class, 'index'])->name('admin.freshlee.master.item');
+    Route::get('freshlee/master/items/create', [ItemController::class, 'create'])->name('admin.freshlee.master.item.create');
+    Route::post('freshlee/master/items/create', [ItemController::class, 'store']);
 });
 
 

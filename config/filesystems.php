@@ -63,6 +63,14 @@ return [
             'url' => env('APP_URL') . '/external_images',
             'visibility' => 'public',
         ],
+
+        'freshleeItems' => [
+            'driver' => 'local',
+            'root' => 'F:\AgriImages',
+            'throw' => false,
+            'url' => env('APP_URL') . '/external_images',
+            'visibility' => 'public',
+        ],
     ],
     
 

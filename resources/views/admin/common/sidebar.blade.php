@@ -180,6 +180,20 @@
                 </a>
             </ul>
         </li>
+        {{-- Freshlee Master --}}
+        <li class="menu-item {{ Request::routeIs('admin.freshlee.master.item') ? 'open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-layer"></i>
+                <div data-i18n="Application-Master" style ="font-size: 0.9rem;">Freshlee Master</div>
+            </a>
+
+            <ul class="menu-sub">
+                <a href="{{ route('admin.freshlee.master.item') }}" class="menu-link">
+                    <i class="menu-icon tf-icons bx bx-layer"></i>
+                    <div data-i18n="Application-Master" style ="font-size: 0.9rem;">Item Details</div>
+                </a>
+            </ul>
+        </li>
 
         <li class="menu-item {{ Request::routeIs('admin.reviewcropimage') ? 'active' : '' }}">
             <a href="{{ route('admin.reviewcropimage') }}" class="menu-link">
