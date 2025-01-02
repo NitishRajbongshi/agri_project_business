@@ -108,7 +108,7 @@
                         <label class="form-label" for="unit_min_order_qty">Minimum Order Unit</label>
                         <select class="form-select @error('unit_min_order_qty') is-invalid @enderror"
                             id="unit_min_order_qty" name="unit_min_order_qty">
-                            <option value="">Select Crop Type</option>
+                            <option value="">Select Item Unit</option>
                             <option value="gm" {{ old('unit_min_order_qty') == $id ? 'selected' : '' }}>GM</option>
                             <option value="kg" {{ old('unit_min_order_qty') == $id ? 'selected' : '' }}>KG</option>
                             <option value="litre" {{ old('unit_min_order_qty') == $id ? 'selected' : '' }}>Litre</option>
@@ -142,7 +142,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var errorAlert = document.getElementById('errorAlert');
-
         if (errorAlert) {
             setTimeout(function() {
                 errorAlert.style.opacity = '0';

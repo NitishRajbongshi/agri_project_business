@@ -164,6 +164,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('freshlee/master/items', [ItemController::class, 'index'])->name('admin.freshlee.master.item');
     Route::get('freshlee/master/items/create', [ItemController::class, 'create'])->name('admin.freshlee.master.item.create');
     Route::post('freshlee/master/items/create', [ItemController::class, 'store']);
+    Route::put('freshlee/master/items/edit', [ItemController::class, 'update'])->name('admin.freshlee.master.item.update');
+    Route::delete('freshlee/master/items/delete', [ItemController::class, 'destroy'])->name('admin.freshlee.master.item.destroy');
+    Route::get('freshlee/master/items/image', [ItemController::class, 'getItemImage'])->name('admin.freshlee.master.item.image');
 });
 
 

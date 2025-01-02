@@ -12,6 +12,12 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
+    @if ($message = Session::get('error'))
+        <div id="successAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="card">
         <div class="d-flex align-items-center">
             <h5 class="card-header">Freshlee Market Item Information Management</h5>
@@ -23,7 +29,7 @@
         </div>
 
         <div class="table-responsive text-nowrap px-4">
-            <table class="table" id="tblUser">
+            <table class="table" id="tblUser" style="font-size: 0.8rem">
                 <thead>
                     <tr>
                         <th>Sl. No.</th>
@@ -34,6 +40,7 @@
                         <th>Farm Life</th>
                         <th>Min. Order</th>
                         <th>Item Unit</th>
+                        <th>Item Image</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -42,19 +49,33 @@
                         <tr>
                             <td style="text-align: center;">{{ $index + 1 }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->item_name }}</>
-                            <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->perishability_descr }}</td>
+                            <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->perishability_descr }}
+                            </td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->item_category_desc }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->product_name }}</td>
-                            <td style="overflow-wrap: break-word; white-space: normal;text-align: center;">{{ $item->farm_life_in_days }}</td>
-                            <td style="overflow-wrap: break-word; white-space: normal;text-align: center;">{{ $item->min_qty_to_order }}</td>
-                            <td style="overflow-wrap: break-word; white-space: normal;text-align: center;">{{ $item->unit_min_order_qty }}</td>
+                            <td style="overflow-wrap: break-word; white-space: normal;text-align: center;">
+                                {{ $item->farm_life_in_days }}</td>
+                            <td style="overflow-wrap: break-word; white-space: normal;text-align: center;">
+                                {{ $item->min_qty_to_order }}</td>
+                            <td style="overflow-wrap: break-word; white-space: normal;text-align: center;">
+                                {{ $item->unit_min_order_qty }}</td>
+                            <td style="overflow-wrap: break-word; white-space: normal;text-align: center;">
+                                <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
+                                    data-bs-target="#imageModal" data-id="{{ $item->item_cd }}">
+                                    <i class="tf-icons bx bx-show"></i> View
+                                </a>
+                            </td>
                             <td>
                                 <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
                                     data-bs-target="#editModal" data-id="{{ $item->item_cd }}"
                                     data-item-name="{{ $item->item_name }}"
+                                    data-item-image="{{ $item->item_image_file_path }}"
                                     data-perishability-cd="{{ $item->perishability_cd }}"
-                                    data-item-category="{{ $item->item_category_cd }}" 
-                                    data-product-type-cd="{{ $item->product_type_cd }}">
+                                    data-item-category="{{ $item->item_category_cd }}"
+                                    data-product-type="{{ $item->product_type_cd }}"
+                                    data-farm-life="{{ $item->farm_life_in_days }}"
+                                    data-min-order="{{ $item->min_qty_to_order }}"
+                                    data-item-unit="{{ $item->unit_min_order_qty }}">
                                     <i class="tf-icons bx bx-edit"></i> Edit
                                 </a>
                                 {{-- <a href="#" class="btn btn-sm btn-outline-danger delete-btn" data-bs-toggle="modal"
@@ -73,46 +94,104 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Crop Information</h5>
+                    <h5 class="modal-title" id="imageModalLabel"><i class='bx bxs-image-add me-2'></i>Item Image</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="editForm" method="POST" action="{{ route('admin.appmaster.crops.update') }}"
-                    autocomplete="off">
+                <div class="modal-body">
+                    <div class="imageContainer w-full h-auto">
+                        {{-- Image will be loaded via AJAX --}}
+                    </div>
+                    <div class="figcaption my-2" style="font-size: 0.8rem; text-align: center;">
+                        {{-- Item name will be loaded via AJAX --}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel"><i class='bx bxs-message-square-edit me-2'></i>Edit Item Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="editForm" method="POST" action="{{ route('admin.freshlee.master.item.update') }}"
+                    autocomplete="off" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    <div class="modal-body">
-                        <input type="hidden" name="crop_name_cd" id="cropNameCd">
-                        <div class="mb-3">
-                            <label for="cropName" class="form-label">Crop Name</label>
-                            <input type="text" class="form-control" id="cropName" name="crop_name_desc"
-                                placeholder=" Enter Crop Name">
-                            <div class="invalid-feedback crop-name-feedback" style="display: none;">
-                                Please provide a Crop Name.
+                    <div class="modal-body d-flex flex-wrap">
+                        <input type="hidden" name="item_cd" id="itemCd">
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="item_name" class="form-label">Item Name</label>
+                            <input type="text" class="form-control" id="item_name" name="item_name"
+                                placeholder=" Enter Item Name" required>
+                            <div class="invalid-feedback item-name-feedback" style="display: none;">
+                                Please provide a Item Name.
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="cropNameAs" class="form-label">Crop Name Assamese</label>
-                            <input type="text" class="form-control" id="cropNameAs" name="crop_name_desc_as"
-                                placeholder=" Enter Crop Name (Assamese)">
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="perishability_cd" class="form-label">Perishability</label>
+                            <select class="form-select" id="perishability_cd" name="perishability_cd" required>
+                                <option value="">Select Perishability</option>
+                                @foreach ($perishabilityTypes as $id => $desc)
+                                    <option value="{{ $id }}">
+                                        {{ $desc }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="registryNo" class="form-label">Crop Registry No</label>
-                            <input type="text" class="form-control" id="registryNo" name="crop_registry_no"
-                                placeholder=" Enter Crop Registry No">
-                            <div class="invalid-feedback registry-no-feedback" style="display: none;">
-                                The Crop Registry No is already in use.
-                            </div>
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="item_category_cd" class="form-label">Item Category</label>
+                            <select class="form-select" id="item_category_cd" name="item_category_cd" required>
+                                <option value="">Select Item Category</option>
+                                @foreach ($itemCategories as $id => $desc)
+                                    <option value="{{ $id }}">
+                                        {{ $desc }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-
-                        <div class="mb-3">
-                            <label for="scientificName" class="form-label">Scientific Name</label>
-                            <input type="text" class="form-control" id="scientificName" name="scientific_name"
-                                placeholder=" Enter Scientific Name">
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="product_type_cd" class="form-label">Product Type</label>
+                            <select class="form-select" id="product_type_cd" name="product_type_cd" required>
+                                <option value="">Select Product Type</option>
+                                @foreach ($productTypes as $id => $desc)
+                                    <option value="{{ $id }}">
+                                        {{ $desc }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="farm_life" class="form-label">Farm Life</label>
+                            <input type="number" class="form-control" id="farm_life" name="farm_life"
+                                placeholder="Enter Farm Life" required>
+                        </div>
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="min_order" class="form-label">Min. Order</label>
+                            <input type="number" class="form-control" id="min_order" name="min_order"
+                                placeholder="Enter Min. Order" required>
+                        </div>
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="item_unit" class="form-label">Minimum Order Unit</label>
+                            <select class="form-select" id="item_unit" name="item_unit" required>
+                                <option value="">Select Item Unit</option>
+                                <option value="gm">GM</option>
+                                <option value="kg">KG</option>
+                                <option value="litre">Litre</option>
+                                <option value="mutha">Mutha</option>
+                                <option value="unit">Unit</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 col-sm-12 col-md-6 px-2">
+                            <label for="item_image" class="form-label">Item Image</label>
+                            <input type="file" class="form-control" id="item_image" name="item_image"
+                                accept="image/*">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -145,127 +224,103 @@
                 </form>
             </div>
         </div>
-    @endsection
-    @section('custom_js')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var successAlert = document.getElementById('successAlert');
+    </div>
+@endsection
+@section('custom_js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var successAlert = document.getElementById('successAlert');
 
-                if (successAlert) {
+            if (successAlert) {
+                setTimeout(function() {
+                    successAlert.style.opacity = '0';
+                    successAlert.style.transition = 'opacity 0.5s ease-out';
                     setTimeout(function() {
-                        successAlert.style.opacity = '0';
-                        successAlert.style.transition = 'opacity 0.5s ease-out';
-                        setTimeout(function() {
-                            successAlert.remove();
-                        }, 500);
-                    }, 5000);
-                }
-            });
+                        successAlert.remove();
+                    }, 500);
+                }, 5000);
+            }
+        });
 
-            $(document).ready(function() {
-                $('#tblUser').DataTable();
+        $(document).ready(function() {
+            $('#tblUser').DataTable();
 
-                $('#editModal').on('show.bs.modal', function(event) {
-                    var button = $(event.relatedTarget);
-                    var cropNameCd = button.data('id');
-                    var cropName = button.data('crop-name');
-                    var cropNameAs = button.data('crop-name-as');
-                    var registryNo = button.data('registry-no');
-                    var scientificName = button.data('scientific-name');
+            $('#imageModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var itemCd = button.data('id');
+                var modal = $(this);
+                var modalBody = modal.find('.modal-body');
+                var imageContainer = modalBody.find('.imageContainer');
+                var figcaption = modalBody.find('.figcaption');
 
-                    var modal = $(this);
-                    modal.find('#cropNameCd').val(cropNameCd);
-                    modal.find('#cropName').val(cropName);
-                    modal.find('#cropNameAs').val(cropNameAs);
-                    modal.find('#registryNo').val(registryNo);
-                    modal.find('#scientificName').val(scientificName);
-                });
-
-                $('#editForm').on('submit', function(e) {
-                    e.preventDefault(); // Prevent form submission
-
-                    var isValid = true;
-                    var cropName = $('#cropName').val().trim();
-                    var registryNo = $('#registryNo').val().trim();
-                    var cropNameCd = $('#cropNameCd').val().trim();
-                    var form = $(this);
-
-                    // Clear previous error states
-                    $('#cropName').removeClass('is-invalid');
-                    $('#registryNo').removeClass('is-invalid');
-                    $('.invalid-feedback').hide();
-
-                    // Check Crop Name field
-                    if (cropName === '') {
-                        $('#cropName').addClass('is-invalid');
-                        $('.invalid-feedback').filter('.crop-name-feedback').show();
-                        isValid = false;
-                    }
-
-                    // Perform AJAX check for duplicate Crop Registry Number only if it's not empty
-                    if (registryNo !== '') {
-                        $.ajax({
-                            url: '{{ route('admin.appmaster.crops.checkRegistryNo') }}',
-                            method: 'POST',
-                            data: {
-                                _token: '{{ csrf_token() }}',
-                                registry_no: registryNo,
-                                crop_name_cd: cropNameCd
-                            },
-                            success: function(response) {
-                                if (response.exists) {
-                                    $('#registryNo').addClass('is-invalid');
-                                    $('.invalid-feedback').filter('.registry-no-feedback').text(
-                                        'The Crop Registry No is already in use.').show();
-                                    isValid = false;
-                                } else {
-                                    $('#registryNo').removeClass('is-invalid');
-                                    $('.invalid-feedback').filter('.registry-no-feedback').hide();
-                                }
-
-                                // If validation is successful, submit the form
-                                if (isValid) {
-                                    form.off('submit').submit(); // Allow form submission
-                                }
-                            },
-                            error: function(xhr) {
-                                console.error('AJAX Error:', xhr); // Debugging output
-                            }
-                        });
-                    } else {
-                        // If the registry number is empty, submit the form directly
-                        if (isValid) {
-                            form.off('submit').submit(); // Allow form submission
-                        }
+                $.ajax({
+                    url: "{{ route('admin.freshlee.master.item.image') }}",
+                    method: 'GET',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        item_cd: itemCd
+                    },
+                    success: function(response) {
+                        figcaption.html('<p>Fig: ' + response.item_name + '</p>');
+                        imageContainer.html('<img src="' + response.image_src +
+                            '" class="img-fluid" alt="Item Image" style="min-width: 100%; max-height: 15rem; border-radius: 7px;">'
+                            );
+                    },
+                    error: function(xhr) {
+                        console.error('AJAX Error:', xhr);
                     }
                 });
+            });
 
-                $('#deleteModal').on('show.bs.modal', function(event) {
-                    var button = $(event.relatedTarget);
-                    var crop_name_cd = button.data('crop_name_cd');
+            $('#editModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var itemCD = button.data('id');
+                var itemName = button.data('item-name');
+                var itemImage = button.data('item-image');
+                var perishabilityCD = button.data('perishability-cd');
+                var itemCategory = button.data('item-category');
+                var productType = button.data('product-type');
+                var farmLife = button.data('farm-life');
+                var minOrder = button.data('min-order');
+                var itemUnit = button.data('item-unit');
 
-                    var modal = $(this);
-                    modal.find('#deleteId').val(crop_name_cd);
-                });
+                var modal = $(this);
+                modal.find('#itemCd').val(itemCD);
+                modal.find('#item_name').val(itemName);
+                modal.find('#perishability_cd').val(perishabilityCD);
+                modal.find('#item_category_cd').val(itemCategory);
+                modal.find('#product_type_cd').val(productType);
+                modal.find('#farm_life').val(farmLife);
+                modal.find('#min_order').val(minOrder);
+                modal.find('#item_unit').val(itemUnit);
+            });
 
-                // Handle form submission for deletion
-                $('#deleteForm').on('submit', function(e) {
-                    e.preventDefault();
+            $('#deleteModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var crop_name_cd = button.data('crop_name_cd');
 
-                    var form = $(this);
+                var modal = $(this);
+                modal.find('#deleteId').val(crop_name_cd);
+            });
 
-                    $.ajax({
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                        },
-                        success: function(response) {
-                            form.off('submit').submit();
-                        },
-                        error: function(xhr) {
-                            console.error('AJAX Error:', xhr);
-                        }
-                    });
+            // Handle form submission for deletion
+            $('#deleteForm').on('submit', function(e) {
+                e.preventDefault();
+
+                var form = $(this);
+
+                $.ajax({
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                    },
+                    success: function(response) {
+                        form.off('submit').submit();
+                    },
+                    error: function(xhr) {
+                        console.error('AJAX Error:', xhr);
+                    }
                 });
             });
-        </script>
-    @endsection
+        });
+    </script>
+@endsection
