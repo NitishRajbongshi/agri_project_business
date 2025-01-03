@@ -12,8 +12,6 @@ class Office extends Model
 
     public function user()
     {
-        return $this->hasMany(User::class, 'office_id')->withDefault([
-            'name' => 'Guest Author',
-        ]);;
+        return $this->hasMany(User::class, 'office_id');
     }
 }

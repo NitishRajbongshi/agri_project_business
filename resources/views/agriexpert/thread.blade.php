@@ -2,7 +2,7 @@
 
 @section('title', '[Agri-Expert] View Thread')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -28,16 +28,16 @@
 
         <div class="row">
             <div class="card-subtitle text-muted col-lg-8 col-mb-8 col-sm-8">
-                Submitted By <span class="text-info">{{$query->query_submitted_by}}</span>, 
-                on {{ date('d-m-Y H:i:s', strtotime($query->query_submitted_on)) }}, 
+                Submitted By <span class="text-info">{{$query->query_submitted_by}}</span>,
+                on {{ date('d-m-Y H:i:s', strtotime($query->query_submitted_on)) }},
                 from {{$query->district}}
             </div>
 
-            <div class="col-lg-4 col-mb-4 col-sm-4"> 
+            <div class="col-lg-4 col-mb-4 col-sm-4">
                 <div class="float-end">
                     {{-- <a href="javascript:void(0)" class="card-link btn btn-primary">Reply Now</a> --}}
                   @if($query->parent_ack_no == null)
-                    <button class="btn btn-md btn-primary OpenAnswerModalBtn" 
+                    <button class="btn btn-md btn-primary OpenAnswerModalBtn"
                     data-query_id="{{ Crypt::encrypt($query->query_id) }}"
                     data-query_submitted_by = "{{ $query->query_submitted_by }}"
                     data-query_submitted_on = "{{ $query->query_submitted_on }}"
@@ -48,7 +48,7 @@
                     data-toggle="tooltip" data-placement="top" title="Write Answer">
                     <i class='bx bx-check-circle'></i>Reply To Query</button>
                     @else
-                      <a href="{{route('agriexpert.loadthread', ['id' => Crypt::encrypt($query->parent_ack_no)])}}" 
+                      <a href="{{route('agriexpert.loadthread', ['id' => Crypt::encrypt($query->parent_ack_no)])}}"
                         class="btn btn-md btn-info">View Parent Thread</a>
                     @endif
                 </div>
@@ -63,7 +63,7 @@
                 {{ $answer['ans_by']}}
             </div> --}}
             <div class="card-body">
-                <p class="card-title">Answer Ack. No.: 
+                <p class="card-title">Answer Ack. No.:
                     <span class="text-info">{{$answer['ans_ack_no']}}</span></p>
                 <div class="card-text">
                     {{$answer['query_ans']}}
@@ -88,7 +88,7 @@
           <h5 class="modal-title" >Accept Question</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        
+
         <div class="modal-body">
 
           <div class="table-responsive text-wrap">
@@ -104,21 +104,21 @@
                 </tr>
               </tbody>
             </table>
-          </div> 
+          </div>
 
-          <form id="formAnswerQuery">    
-            @csrf                   
+          <form id="formAnswerQuery">
+            @csrf
                <input type="hidden" id="answer_query_id" name="answer_query_id"  value="">
-              
+
                <div class="row mt-2">
                 <label for="queryAnswer" class="col-sm-3 col-form-label"><strong> Write Answer: </strong></label>
                 <div class="col-sm-9">
                     <textarea rows="4" class="form-control" id="queryAnswer" name="queryAnswer" aria-label="Write an answer"></textarea>
                 </div>
                </div>
-        </div>   
+        </div>
         {{-- End of Modal Body --}}
-        
+
         <div class="modal-footer">
 
           <button type="submit" class="btn btn-success" id="answerQueryBtn" >
@@ -128,7 +128,7 @@
             Close
           </button>
         </div>
-      </form> 
+      </form>
 
       </div>
     </div>
@@ -141,7 +141,11 @@
 <script>
 $(document).ready(function(){
 
-    
+    const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
+
     $('.OpenAnswerModalBtn').click(function(){
 
         var question = $(this).data('query_desc');
@@ -163,8 +167,8 @@ $(document).ready(function(){
 
     // Answer Query AJAX
     $('#answerQueryBtn').click(function(e){
-        
-        e.preventDefault(); 
+
+        e.preventDefault();
         $.ajax({
             url: '{{ route('agriexpert.answerquery') }}',
             data: $("#formAnswerQuery").serialize(),
@@ -182,11 +186,11 @@ $(document).ready(function(){
             else if(data.status == 0) {
                 alert(data.message);
             }
-            }, 
+            },
             error: function(){
                 alert("Query answering failed.Something went wrong!");
             }
-        }); 
+        });
     });
 
 });

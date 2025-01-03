@@ -16,10 +16,12 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('admin_assets/img/favicon/agri.ico') }}" />
+
     <script src="{{ asset('admin_assets/vendor/libs/jquery/jquery.js') }}"></script>
     <script src="{{ asset('admin_assets/vendor/libs/popper/popper.js') }}"></script>
     <script src="{{ asset('admin_assets/vendor/js/bootstrap.js') }}"></script>
     <script src="{{ asset('admin_assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+
     <script src="{{ asset('admin_assets/vendor/js/menu.js') }}"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -31,7 +33,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
 
     <!-- datatable cdn -->
-    <link rel="stylesheet" href="{{ asset('admin_assets/vendor/css/jquery.dataTables.min.css')}}">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,11 +46,11 @@
     <link rel="stylesheet" href="{{ asset('admin_assets/vendor/fonts/boxicons.css') }}" />
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="{{ asset('admin_assets/vendor/css/core.css') }}" class="template-customizer-core-css" />
-    {{-- <link rel="stylesheet" href="{{ asset('admin_assets/vendor/css/adminlte.css') }}"/> --}}
+    <link rel="stylesheet" href="{{ asset('admin_assets/vendor/css/core.css') }}"
+        class="template-customizer-core-css" />
     <link rel="stylesheet" href="{{ asset('admin_assets/vendor/css/theme-default.css') }}"
         class="template-customizer-theme-css" />
-    {{-- <link rel="stylesheet" href="{{ asset('admin_assets/css/demo.css') }}" /> --}}
+    <link rel="stylesheet" href="{{ asset('admin_assets/css/demo.css') }}" />
 
     <!-- Vendors CSS -->
     <link rel="stylesheet" href="{{ asset('admin_assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
@@ -65,11 +67,6 @@
     <script src="{{ asset('admin_assets/js/config.js') }}"></script>
 
     @yield('custom_header')
-
-    {{-- Bootstrap Start --}}
-    {{-- <link rel="stylesheet" href="{{ asset('admin_assets/bootstrap-5.3.3/css/bootstrap.min.css') }}" class="bootstrap-min-css" /> --}}
-    {{-- <script src="{{ asset('admin_assets/bootstrap-5.3.3/js/bootstrap.min.js') }}"></script> --}}
-    {{-- Bootstrap End --}}
 </head>
 
 <body>

@@ -300,6 +300,10 @@
 
     // Open View Modal
     $(document).ready( function () {
+        const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
         $('#tblQueries').DataTable();
 
         $('#queryCategoryManagerBtn').on('click', function(){

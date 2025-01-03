@@ -15,9 +15,9 @@ class CropDiseaseController extends Controller
     public function index()
     {
         $data = DB::table('ag_crop_disease_master as u')
-        ->join('ag_crop_type_master as c', 'u.crop_type_cd', '=', 'c.crop_type_cd')
-        ->select('u.disease_cd', 'u.disease_name','u.crop_type_cd', 'u.disease_name_as', 'c.crop_type_desc as crop_type_desc', 'u.scientific_name', 'u.folder_name')
-        ->get();
+            ->join('ag_crop_type_master as c', 'u.crop_type_cd', '=', 'c.crop_type_cd')
+            ->select('u.disease_cd', 'u.disease_name', 'u.crop_type_cd', 'u.disease_name_as', 'c.crop_type_desc as crop_type_desc', 'u.scientific_name', 'u.folder_name')
+            ->get();
 
         $cropTypes = DB::table('ag_crop_type_master')->pluck('crop_type_desc', 'crop_type_cd');
         $cropTypes = $cropTypes->toArray();
@@ -62,8 +62,27 @@ class CropDiseaseController extends Controller
                 'updated_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-        return redirect()->route('admin.appmaster.cropdisease')->with('success', 'Crop disease updated successfully.');
+        $updatedDisease = DB::table('ag_crop_disease_master')
+            ->where('disease_cd', $validated['disease_cd'])
+            ->first();
+
+        // $cropTypes = DB::table('ag_crop_type_master')->pluck('crop_type_desc', 'crop_type_cd');
+
+        $cropTypes = DB::table('ag_crop_type_master')
+        ->where('crop_type_cd', $updatedDisease->crop_type_cd)
+        ->value('crop_type_desc');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Crop disease updated successfully.',
+            'updatedDisease' => $updatedDisease,
+            'cropTypes' => $cropTypes
+        ]);
+
+        // return redirect()->route('admin.appmaster.cropdisease')->with('success', 'Crop disease updated successfully.');
     }
+
+
     public function create(Request $request)
     {
         if ($request->isMethod('post')) {
@@ -97,7 +116,9 @@ class CropDiseaseController extends Controller
                 'created_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-            return redirect()->route('admin.appmaster.cropdisease')->with('success', 'Crop disease created successfully.');
+            // return redirect()->route('admin.appmaster.cropdisease')->with('success', 'Crop disease created successfully.');
+
+            return redirect()->back()->with('success', 'Crop disease created successfully.');
         }
 
         // Fetch crop types for the dropdown
@@ -122,6 +143,12 @@ class CropDiseaseController extends Controller
             ->where('disease_cd', $validated['disease_cd'])
             ->delete();
 
-        return redirect()->route('admin.appmaster.cropdisease')->with('success', 'Disease deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Disease deleted successfully.',
+            'disease_cd' => $validated['disease_cd']
+        ]);
+
+        // return redirect()->route('admin.appmaster.cropdisease')->with('success', 'Disease deleted successfully.');
     }
 }

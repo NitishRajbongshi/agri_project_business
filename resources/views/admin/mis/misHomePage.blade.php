@@ -130,6 +130,10 @@
 @section('custom_js')
     <script>
         $(document).ready(function() {
+            const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.fontSize = '14px';
+        });
             $('#tblNews').DataTable({
                 "buttons": [{
                         extend: 'copy',

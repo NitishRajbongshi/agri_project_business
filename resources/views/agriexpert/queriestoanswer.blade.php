@@ -2,7 +2,7 @@
 
 @section('title', '[Agri-Expert] Answer Queries')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -11,7 +11,7 @@
     <div class="d-flex align-items-center">
         <h5 class="card-header">Query Viewer</h5>
         {{-- <div>
-            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" 
+            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
             data-bs-target="#createCropTypeModal">
               <i class="tf-icons bx bx-plus-medical"></i>
                 XXXXXX
@@ -50,12 +50,12 @@
                     @endif
                   </td>
                   <td>
-                    {{-- <button class="btn btn-sm btn-outline-primary OpenViewModalBtn" 
+                    {{-- <button class="btn btn-sm btn-outline-primary OpenViewModalBtn"
                     data-crop_type_cd="{{Crypt::encrypt($item->query_id)}}"
                     data-crop_type_desc = "{{$item->query_desc}}">
                     <i class='bx bx-show'></i>View</button> --}}
 
-                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn" 
+                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -66,7 +66,7 @@
                     data-toggle="tooltip" data-placement="top" title="View Query">
                     <i class='bx bx-show'></i>View</button>
 
-                    <button class="btn btn-sm btn-outline-success OpenAnswerModalBtn" 
+                    <button class="btn btn-sm btn-outline-success OpenAnswerModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -76,19 +76,19 @@
                     data-district = "{{ $item->district }}""
                     data-toggle="tooltip" data-placement="top" title="Accept Query">
                     <i class='bx bx-check-circle'></i>Answer</button>
-  
-                    {{-- <button class="btn btn-sm btn-outline-success acceptBtn" 
+
+                    {{-- <button class="btn btn-sm btn-outline-success acceptBtn"
                     data-crop_type_cd="{{Crypt::encrypt($item->query_id)}}">
                     <i class='bx bx-check-circle'></i>Answer</button> --}}
 
                   </td>
                 </tr>
-              @empty 
+              @empty
                 <tr>
                     <td colspan="3">No data found</td>
                 </tr>
-              @endforelse 
-            
+              @endforelse
+
           </tbody>
         </table>
       </div>
@@ -102,9 +102,9 @@
             <h5 class="modal-title" >View Question</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          
+
           <div class="modal-body">
-            
+
             <div class="table-responsive text-wrap">
               <table class="table table-hover">
                 <tbody class="table-border-bottom-0">
@@ -118,17 +118,17 @@
                   </tr>
                 </tbody>
               </table>
-            </div> 
+            </div>
 
-          </div> 
+          </div>
         </div>
         <div class="modal-footer">
-         
+
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
             Close
           </button>
         </div>
-       
+
       </div>
     </div>
   </div>
@@ -141,7 +141,7 @@
           <h5 class="modal-title" >Accept Question</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        
+
         <div class="modal-body">
 
           <div class="table-responsive text-wrap">
@@ -157,10 +157,10 @@
                 </tr>
               </tbody>
             </table>
-          </div> 
+          </div>
 
-          <form id="formAnswerQuery">    
-            @csrf                   
+          <form id="formAnswerQuery">
+            @csrf
                <input type="hidden" id="answer_query_id" name="answer_query_id"  value="">
                {{-- <div class="row">
                 <label for="queryCategorySelect" class="col-sm-3 col-form-label"><strong> Category: </strong></label>
@@ -168,7 +168,7 @@
                     <select class="form-select" id="queryCategorySelect" name="queryCategorySelect" aria-label="Select Query Category" required>
                       <option selected value="" >Select Category</option>
                       @foreach ($categories as $category)
-                        <option value="{{ $category->catg_id }}">{{ $category->catg_descr }}</option>  
+                        <option value="{{ $category->catg_id }}">{{ $category->catg_descr }}</option>
                       @endforeach
                     </select>
                   </div>
@@ -180,9 +180,9 @@
                     <textarea rows="4" class="form-control" id="queryAnswer" name="queryAnswer" aria-label="Write an answer"></textarea>
                 </div>
                </div>
-        </div>   
+        </div>
         {{-- End of Modal Body --}}
-        
+
         <div class="modal-footer">
 
           <button type="submit" class="btn btn-success" id="answerQueryBtn" >
@@ -192,7 +192,7 @@
             Close
           </button>
         </div>
-      </form> 
+      </form>
 
       </div>
     </div>
@@ -200,9 +200,13 @@
 
 @endsection
 
-@section('custom_js')  
+@section('custom_js')
 <script>
     $(document).ready( function () {
+        const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
         $('#tblQueriesToAnswer').DataTable();
 
         $("#tblQueriesToAnswer").on("click", ".OpenViewModalBtn", function(){
@@ -244,8 +248,8 @@
 
         // Accept Query AJAX
       $('#answerQueryBtn').click(function(e){
-        
-        e.preventDefault(); 
+
+        e.preventDefault();
         // data= $("#formAnswerQuery").serialize();
         // alert(data);
           $.ajax({
@@ -265,11 +269,11 @@
                 else if(data.status == 0) {
                   alert(data.message);
                 }
-              }, 
+              },
               error: function(){
                     alert("Query answering failed.Something went wrong!");
               }
-          }); 
+          });
         });
 
 
@@ -277,6 +281,6 @@
           $('[data-toggle="tooltip"]').tooltip()
         })
     } );
-</script> 
+</script>
 @endsection
 

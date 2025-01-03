@@ -9,26 +9,44 @@ use App\Models\Appmaster\CropName;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SymptomController extends Controller
 {
 
     public function index(Request $request)
     {
-        // Fetch crop types
-        $cropTypes = DB::table('ag_crop_type_master')
-                ->select('crop_type_cd', DB::raw('UPPER(crop_type_desc) as crop_type_desc' ))
-                ->orderBy('crop_type_desc')->get();
 
-        $cropNames = DB::table('ag_crop_name_master')
-                ->select('crop_name_cd', DB::raw('UPPER(crop_name_desc) as crop_name_desc' ), 'crop_name_desc_as')
-                ->orderBy('crop_name_desc')->get();
-        
+        $cropTypes = DB::table('ag_crop_type_master')
+            ->pluck('crop_type_desc', 'crop_type_cd');
+
+        $cropTypes = $cropTypes->toArray();
+
+        // Sort the crop types alphabetically
+        asort($cropTypes);
+
+        // Convert all letters to uppercase
+        $cropTypes = array_map(function ($description) {
+            return strtoupper($description); // Convert all letters to uppercase
+        }, $cropTypes);
+
+        // Fetch diseases with crop type association
         $diseases = DB::table('ag_crop_disease_master')
-            ->select('disease_cd', DB::raw('UPPER(disease_name) as disease_name' ) , 'crop_type_cd')
+            ->select('disease_cd', 'disease_name', 'crop_type_cd')
             ->get()
             ->groupBy('crop_type_cd');
-       
+
+
+        // Convert disease names to uppercase
+        $diseases = $diseases->map(function ($diseaseGroup) {
+            return $diseaseGroup->map(function ($disease) {
+                // Convert each disease name to uppercase
+                $disease->disease_name = strtoupper($disease->disease_name);
+                return $disease;
+            });
+        });
+
+
         // Fetch symptoms data
         $symptoms = DB::table('ag_crop_disease_symptom_master as u')
             ->join('ag_languages_master as l', 'u.language_cd', '=', 'l.lang_code')
@@ -42,7 +60,6 @@ class SymptomController extends Controller
         // Return view with all the necessary data
         return view('admin.appmaster.symptom', [
             'cropTypes' => $cropTypes,
-            'cropNames' => $cropNames,
             'diseases' => $diseases,
             'symptoms' => $symptoms,
             'languages' => $languages
@@ -72,30 +89,37 @@ class SymptomController extends Controller
                 'updated_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-        return redirect()->route('admin.appmaster.symptom')->with('success', 'Symptom updated successfully.');
+        $cropSymptom = DB::table('ag_crop_disease_symptom_master')
+            ->where('id', $validated['id'])
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Symptom updated successfully.',
+            'cropSymptom' => $cropSymptom
+        ]);
+
+        // return redirect()->route('admin.appmaster.symptom')->with('success', 'Symptom updated successfully.');
     }
+
+
+    
 
     public function create(Request $request)
     {
         if ($request->isMethod('post')) {
-            // Validate the request
             $validated = $request->validate([
                 'symptom' => 'required|string|max:255',
                 'language_cd' => 'required|string|max:255',
-                'disease_cd' => 'required|integer|exists:ag_crop_type_master,crop_type_cd',
+                'disease_cd' => 'required|integer|exists:ag_crop_disease_master,disease_cd',
             ], [
                 'disease_cd.required' => 'Disease is required.',
                 'language_cd.required' => 'Language is required.',
             ]);
 
+            $maxId = DB::table('ag_crop_disease_symptom_master')->max('id');
+            $nextId = $maxId ? $maxId + 1 : 1;
 
-
-            $maxId = DB::table('ag_crop_disease_symptom_master')
-                ->max('id');
-
-            $nextId = $maxId ? $maxId + 1 : 1; // Increment the highest ID or start at 1
-
-            //     // Insert the new crop information
             DB::table('ag_crop_disease_symptom_master')->insert([
                 'id' => $nextId,
                 'symptom' => $validated['symptom'],
@@ -105,24 +129,22 @@ class SymptomController extends Controller
                 'created_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-            return redirect()->route('admin.appmaster.symptom')->with('success', 'Symptom created successfully.');
+            return redirect()->back()->with('success', 'Symptom created successfully.');
+            // return redirect()->route('admin.appmaster.symptom')->with('success', 'Symptom created successfully.');
         }
 
-        // // Fetch crop types for the dropdown
+
         $disease = DB::table('ag_crop_disease_master')->pluck('disease_name', 'disease_cd');
         $disease = $disease->map(function ($description) {
-            return strtoupper($description); // Convert each crop type description to uppercase
+            return strtoupper($description);
         });
-
-        // Sort the crop types alphabetically
         $disease = $disease->sort();
 
         $languages = DB::table('ag_languages_master')->pluck('lang_name', 'lang_code');
-
-
         return view('admin.appmaster.createsymptom', ['disease' => $disease, 'languages' => $languages]);
-
     }
+
+
     public function destroy(Request $request)
     {
         $validated = $request->validate([
@@ -133,7 +155,12 @@ class SymptomController extends Controller
             ->where('id', $validated['id'])
             ->delete();
 
-        return redirect()->route('admin.appmaster.symptom')->with('success', 'Symptom deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Symptom deleted successfully.',
+            'id' => $validated['id']
+        ]);
+
     }
 
 }

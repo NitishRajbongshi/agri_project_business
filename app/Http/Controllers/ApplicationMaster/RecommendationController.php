@@ -23,12 +23,12 @@ class RecommendationController extends Controller
             ->pluck('disease_name', 'disease_cd');
 
 
-            $disease = $disease->map(function ($name) {
-                return strtoupper($name); // Convert each disease name to uppercase
-            });
+        $disease = $disease->map(function ($name) {
+            return strtoupper($name); // Convert each disease name to uppercase
+        });
 
-            // Sort the diseases alphabetically
-            $disease = $disease->sort(); 
+        // Sort the diseases alphabetically
+        $disease = $disease->sort();
 
         $crops = DB::table('ag_crop_name_master')->pluck('crop_name_desc', 'crop_name_cd');
 
@@ -73,7 +73,17 @@ class RecommendationController extends Controller
                 'updated_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-        return redirect()->route('admin.appmaster.recommendation')->with('success', 'Recommendation updated successfully.');
+        $cropRecom = DB::table('ag_crop_master_disease_n_crop_name_n_control_measure_mapping')
+            ->where('mapping_id', $validated['mapping_id'])
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Recommendation updated successfully.',
+            'cropRecom' => $cropRecom
+        ]);
+
+        // return redirect()->route('admin.appmaster.recommendation')->with('success', 'Recommendation updated successfully.');
     }
 
 
@@ -105,7 +115,9 @@ class RecommendationController extends Controller
                 'created_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-            return redirect()->route('admin.appmaster.recommendation')->with('success', 'Recommendation created successfully.');
+            return redirect()->back()->with('success', 'Recommendation created successfully.');
+
+            // return redirect()->route('admin.appmaster.recommendation')->with('success', 'Recommendation created successfully.');
         }
 
 
@@ -141,7 +153,13 @@ class RecommendationController extends Controller
             ->where('mapping_id', $validated['mapping_id'])
             ->delete();
 
-        return redirect()->route('admin.appmaster.recommendation')->with('success', 'Recommendation deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Recommendation deleted successfully.',
+            'mapping_id' => $validated['mapping_id']
+        ]);
+
+        // return redirect()->route('admin.appmaster.recommendation')->with('success', 'Recommendation deleted successfully.');
     }
 
 }

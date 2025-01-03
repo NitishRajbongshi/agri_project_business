@@ -2,7 +2,7 @@
 
 @section('title', 'Answer Queries')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -11,7 +11,7 @@
     <div class="d-flex align-items-center">
         <h5 class="card-header">Query Viewer</h5>
         {{-- <div>
-            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" 
+            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal"
             data-bs-target="#createCropTypeModal">
               <i class="tf-icons bx bx-plus-medical"></i>
                 XXXXXX
@@ -50,23 +50,23 @@
                     @endif
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn" 
+                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn"
                     data-crop_type_cd="{{Crypt::encrypt($item->query_id)}}"
                     data-crop_type_desc = "{{$item->query_desc}}">
                     <i class='bx bx-show'></i>View</button>
-  
-                    <button class="btn btn-sm btn-outline-success acceptBtn" 
+
+                    <button class="btn btn-sm btn-outline-success acceptBtn"
                     data-crop_type_cd="{{Crypt::encrypt($item->query_id)}}">
                     <i class='bx bx-check-circle'></i>Answer</button>
 
                   </td>
                 </tr>
-              @empty 
+              @empty
                 <tr>
                     <td colspan="3">No data found</td>
                 </tr>
-              @endforelse 
-            
+              @endforelse
+
           </tbody>
         </table>
       </div>
@@ -74,11 +74,15 @@
 
 @endsection
 
-@section('custom_js')  
+@section('custom_js')
 <script>
     $(document).ready( function () {
+        const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
         $('#tblQueriesToAnswer').DataTable();
     } );
-</script> 
+</script>
 @endsection
 

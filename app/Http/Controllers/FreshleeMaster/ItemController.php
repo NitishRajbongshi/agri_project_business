@@ -39,11 +39,10 @@ class ItemController extends Controller
                 'productTypes' => $productTypes
             ]);
         } catch (\Exception $e) {
-            // Log::error($e->getMessage(), [
-            //     'file' => $e->getFile(),
-            //     'line' => $e->getLine(),
-            // ]);
-            Log::error($e->getMessage());
+            Log::error($e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
             return view('errors.generic');
         }
     }
@@ -135,11 +134,19 @@ class ItemController extends Controller
                     } catch (\Exception $e) {
                         Storage::disk('freshleeItems')->delete($imageName);
                         DB::rollBack();
+                        Log::error($e->getMessage(), [
+                            'file' => $e->getFile(),
+                            'line' => $e->getLine(),
+                        ]);
                         return redirect()->route('admin.freshlee.master.item.create')
                             ->with('error', 'Internal Server Error!');
                     }
                 } catch (\Exception $e) {
                     DB::rollBack();
+                    Log::error($e->getMessage(), [
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
                     return redirect()->route('admin.freshlee.master.item.create')
                         ->with('error', 'Failed to store image!');
                 }
@@ -234,11 +241,19 @@ class ItemController extends Controller
                 } catch (\Exception $e) {
                     Storage::disk('freshleeItems')->delete($imageName);
                     DB::rollBack();
+                    Log::error($e->getMessage(), [
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ]);
                     return redirect()->back()
                         ->with('error', 'Internal Server Error!');
                 }
             } catch (\Exception $e) {
                 DB::rollBack();
+                Log::error($e->getMessage(), [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
                 return redirect()->back()
                     ->with('error', 'Failed to store image!');
             }

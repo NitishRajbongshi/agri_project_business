@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -26,8 +26,15 @@
 </div>
 @endsection
 
-@section('custom_js')    
+@section('custom_js')
 <script>
+    $(document).ready(function(){
+
+    const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
+                });
     $('#changePaswwordForm').on('submit', function(e) {
         e.preventDefault();
         const btn = $('#changePaswwordBtn');

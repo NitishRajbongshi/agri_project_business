@@ -2,7 +2,7 @@
 
 
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -32,7 +32,7 @@
         </div>
 
     </div>
- 
+
 
   <div class="table-responsive text-nowrap px-4">
     <table class="table" id="tblNews">
@@ -68,10 +68,10 @@
                     class="btn btn-sm btn-outline-primary">
                     <i class="tf-icons bx bx-edit"></i>Edit</a> --}}
 
-                  {{-- <button class="btn btn-sm btn-outline-danger deleteUserBtn" 
+                  {{-- <button class="btn btn-sm btn-outline-danger deleteUserBtn"
                   data-id="{{Crypt::encrypt($item->id)}}">
                   <i class="tf-icons bx bx-trash"></i>Delete</button> --}}
-                  
+
               {{-- </td> --}}
           </tr>
       @empty
@@ -90,6 +90,10 @@
 @section('custom_js')
 <script>
     $(document).ready( function () {
+    const allElements = document.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.fontSize = '14px';
+                });
       $('#tblNews').DataTable();
     } );
 </script>

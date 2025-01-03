@@ -6,14 +6,10 @@
 @endsection
 
 @section('main')
-
-    @if ($message = Session::get('success'))
-        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ $message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
+    <div id="successAlert" class="alert alert-success alert-dismissible fade d-none" role="alert">
+        <span class="alert-message"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <div class="card">
         <div class="d-flex align-items-center">
             <h5 class="card-header">Suitability Management</h5>
@@ -38,7 +34,7 @@
                 </thead>
                 <tbody class="table-border-bottom-0">
                     @forelse ($data as $index => $item)
-                        <tr>
+                        <tr data-id={{ $item->id }} data-original-index="{{ $index + 1 }}">
                             <td>{{ $index + 1 }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->soil }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->soil_as }}</td>
@@ -46,9 +42,12 @@
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->sowing_time_as }}</td>
                             <td>
                                 <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editModal" data-id="{{ $item->id }}"
-                                    data-crop-type="{{ $item->crop_type_cd }}" data-crop-name="{{ $item->crop_name_cd }}"
-                                    data-soil="{{ $item->soil }}" data-soil-as="{{ $item->soil_as }}"
+                                    data-bs-target="#editModal"
+                                    data-id="{{ $item->id }}"
+                                    data-crop-type="{{ $item->crop_type_cd }}"
+                                    data-crop-name="{{ $item->crop_name_cd }}"
+                                    data-soil="{{ $item->soil }}"
+                                    data-soil-as="{{ $item->soil_as }}"
                                     data-sowing-time="{{ $item->sowing_time }}"
                                     data-sowing-time-as="{{ $item->sowing_time_as }}">
                                     <i class="tf-icons bx bx-edit"></i> Edit
@@ -108,21 +107,18 @@
                         <input type="hidden" name="id" id="id">
                         <div class="mb-3">
                             <label for="soil" class="form-label">Soil</label>
-                            <textarea rows="4" class="form-control" id="soil" name="soil"
-                                placeholder="Enter Soil"></textarea>
+                            <textarea rows="4" class="form-control" id="soil" name="soil" placeholder="Enter Soil"></textarea>
                             <div class="invalid-feedback soil-feedback" style="display: none;">
                                 Please provide Soil
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="soilAs" class="form-label">Soil Assamese</label>
-                            <textarea rows="4" class="form-control" id="soilAs" name="soil_as"
-                                placeholder="Enter Soil (Assamese)"></textarea>
+                            <textarea rows="4" class="form-control" id="soilAs" name="soil_as" placeholder="Enter Soil (Assamese)"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="sowingTime" class="form-label">Sowing Time</label>
-                            <textarea rows="4" class="form-control" id="sowingTime" name="sowing_time"
-                                placeholder="Enter Sowing Time"></textarea>
+                            <textarea rows="4" class="form-control" id="sowingTime" name="sowing_time" placeholder="Enter Sowing Time"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="sowingTimeAs" class="form-label">Sowing Time Assamese</label>
@@ -165,21 +161,11 @@
 
 @section('custom_js')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var successAlert = document.getElementById('successAlert');
-
-            if (successAlert) {
-                setTimeout(function() {
-                    successAlert.style.opacity = '0';
-                    successAlert.style.transition = 'opacity 0.5s ease-out';
-                    setTimeout(function() {
-                        successAlert.remove();
-                    }, 500);
-                }, 5000);
-            }
-        });
-
         $(document).ready(function() {
+            const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
             $('#tblCropType').DataTable();
 
             $('#editModal').on('show.bs.modal', function(event) {
@@ -292,9 +278,73 @@
                 }
 
                 if (isValid) {
-                    form.off('submit').submit();
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: 'PUT',
+                        data: form.serialize(),
+                        dataType: 'json',
+                        success: function(response) {
+
+                            if (response.success) {
+
+                                console.log(response);
+
+                                $('#editModal').modal('hide');
+                                $('#successAlert .alert-message').text(
+                                    response.message);
+                                $('#successAlert').removeClass('d-none')
+                                    .addClass('show');
+
+                                setTimeout(function() {
+                                    $('#successAlert')
+                                        .removeClass('show')
+                                        .addClass('d-none');
+                                }, 5000);
+
+                                const targetRow = $(
+                                    `#tblCropType tbody tr[data-id="${response.cropSuitability.id}"]`
+                                );
+
+                                targetRow.find('td:nth-child(2)').text(response.cropSuitability.soil);
+                                targetRow.find('td:nth-child(3)').text(response.cropSuitability.soil_as);
+                                targetRow.find('td:nth-child(4)').text(response.cropSuitability.sowing_time);
+                                targetRow.find('td:nth-child(5)').text(response.cropSuitability.sowing_time_as);
+
+                                const editButton = targetRow.find('.edit-btn');
+                                editButton.data('id', response.cropSuitability.id);
+                                editButton.data('crop-type', response.cropSuitability.crop_type_cd);
+                                editButton.data('crop-name', response.cropSuitability.crop_name_cd);
+                                editButton.data('soil', response.cropSuitability.soil);
+                                editButton.data('soil-as', response.cropSuitability.soil_as);
+                                editButton.data('sowing-time', response.cropSuitability.sowing_time);
+                                editButton.data('sowing-time-as', response.cropSuitability.sowing_time_as);
+
+
+                                targetRow.data('original-index', response.cropSuitability.id);
+                                var table = $('#tblCropType').DataTable();
+                                table.draw(false);
+                                updateSerialNumbers(table);
+                            } else {
+                                alert('Failed to update variety.');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error updating variety:', xhr
+                                .responseText);
+                            alert(
+                                'There was an error updating the variety.');
+                        }
+                    });
                 }
             });
+
+            function updateSerialNumbers(table) {
+                table.rows().every(function(index) {
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
+                });
+            }
 
             $('#deleteModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
@@ -304,24 +354,56 @@
                 modal.find('#deleteId').val(id);
             });
 
-            // Handle form submission for deletion
+
             $('#deleteForm').on('submit', function(e) {
                 e.preventDefault();
-
                 var form = $(this);
 
                 $.ajax({
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                    },
+                    url: form.attr('action'),
+                    method: 'DELETE',
+                    data: form.serialize(),
+                    dataType: 'json',
                     success: function(response) {
-                        form.off('submit').submit();
+                        if (response.success) {
+                            var rowToDelete = $('#tblCropType tbody tr[data-id="' +
+                                response.id + '"]');
+                            var table = $('#tblCropType').DataTable();
+
+                            table.row(rowToDelete).remove().draw(false);
+                            table.draw(false);
+
+                            updateSerialNumbers(table);
+
+                            $('#successAlert .alert-message').text(response.message);
+                            $('#successAlert').removeClass('d-none').addClass('show');
+
+                            setTimeout(function() {
+                                $('#successAlert').removeClass('show').addClass('d-none');
+                            }, 5000);
+
+                            $('#deleteModal').modal('hide');
+                        } else {
+                            console.error('Failed to delete variety:', response.message);
+                            alert('Failed to delete the variety.');
+                        }
                     },
                     error: function(xhr) {
-                        console.error('AJAX Error:', xhr);
+                        console.error('Error deleting variety:', xhr.responseText);
+                        alert('There was an error deleting the variety.');
                     }
                 });
             });
+
+
+            function updateSerialNumbers(table) {
+                table.rows().every(function(index) {
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
+                });
+            }
+
         });
     </script>
 @endsection

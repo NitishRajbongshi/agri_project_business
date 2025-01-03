@@ -40,20 +40,14 @@ class User extends Authenticatable
 
     public function designation()
     {
-        return $this->belongsTo(Designation::class, 'designation_id')->withDefault([
-            'name' => 'NA'
-        ]);
+        return $this->belongsTo(Designation::class, 'designation_id');
     }
     public function department()
     {
-        return $this->belongsTo(Department::class, 'department_id')->withDefault([
-            'name' => 'NA'
-        ]);
+        return $this->belongsTo(Department::class, 'department_id');
     }
     public function office()
     {
-        return $this->belongsTo(Office::class, 'office_id')->withDefault([
-            'name' => 'NA'
-        ]);
+        return $this->belongsTo(Office::class, 'office_id');
     }
 }

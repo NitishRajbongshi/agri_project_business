@@ -34,9 +34,20 @@ class CropTypeController extends Controller
             ->update([
                 'crop_type_desc' => $validated['crop_type_desc'],
                 'crop_type_desc_as' => $validated['crop_type_desc_as'],
+                'updated_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-        return redirect()->route('admin.appmaster.croptype')->with('success', 'Crop type updated successfully.');
+        $updatedCropType = DB::table('ag_crop_type_master')
+            ->where('crop_type_cd', $validated['crop_type_cd'])
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Crop Type updated successfully.',
+            'updatedCropType' => $updatedCropType
+        ]);
+
+        // return redirect()->route('admin.appmaster.croptype')->with('success', 'Crop type updated successfully.');
     }
 
     public function create(Request $request)
@@ -58,9 +69,13 @@ class CropTypeController extends Controller
                 'crop_type_cd' => $nextId,
                 'crop_type_desc' => $validated['crop_type'],
                 'crop_type_desc_as' => $validated['crop_type_assamese'],
+                'updated_at' => now()->setTimezone('Asia/Kolkata'),
+                'created_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-            return redirect()->route('admin.appmaster.croptype')->with('success', 'Crop type created successfully.');
+            return redirect()->back()->with('success', 'Crop type added successfully.');
+
+            // return redirect()->route('admin.appmaster.croptype')->with('success', 'Crop type created successfully.');
         }
 
         return view('admin.appmaster.createcroptype');
@@ -75,6 +90,12 @@ class CropTypeController extends Controller
             ->where('crop_type_cd', $validated['crop_type_cd'])
             ->delete();
 
-        return redirect()->route('admin.appmaster.croptype')->with('success', 'Crop type deleted successfully.');
+        // return redirect()->route('admin.appmaster.croptype')->with('success', 'Crop type deleted successfully.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Crop type deleted successfully.',
+            'crop_type_cd' => $validated['crop_type_cd']
+        ]);
     }
 }

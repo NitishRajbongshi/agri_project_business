@@ -6,13 +6,10 @@
 @endsection
 
 @section('main')
-
-    @if ($message = Session::get('success'))
-        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ $message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+    <div id="successAlert" class="alert alert-success alert-dismissible fade d-none" role="alert">
+        <span class="alert-message"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
     <div class="card">
         <div class="d-flex align-items-center">
@@ -39,7 +36,7 @@
                 </thead>
                 <tbody class="table-border-bottom-0">
                     @forelse ($data as $index => $item)
-                        <tr>
+                        <tr data-disease-cd={{ $item->disease_cd }} data-original-index="{{ $index + 1 }}">
                             <td>{{ $index + 1 }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->disease_name }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->disease_name_as }}</td>
@@ -49,7 +46,8 @@
                             <td>
 
                                 <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
-                                    data-bs-target="#editModal" data-id="{{ $item->disease_cd }}"
+                                    data-bs-target="#editModal"
+                                    data-id="{{ $item->disease_cd }}"
                                     data-disease-name="{{ $item->disease_name }}"
                                     data-disease-name-as="{{ $item->disease_name_as }}"
                                     data-crop-type="{{ $item->crop_type_cd }}"
@@ -101,7 +99,9 @@
                                 Please select a Crop Type.
                             </div>
                         </div>
+
                         <input type="hidden" name="disease_cd" id="diseaseCd">
+
                         <div class="mb-3">
                             <label for="diseaseName" class="form-label">Disease Name</label>
                             <input type="text" class="form-control" id="diseaseName" name="disease_name"
@@ -110,6 +110,7 @@
                                 Please provide a Disease Name.
                             </div>
                         </div>
+
                         <div class="mb-3">
                             <label for="diseaseNameAs" class="form-label">Disease Name Assamese</label>
                             <input type="text" class="form-control" id="diseaseNameAs" name="disease_name_as"
@@ -161,21 +162,12 @@
 
 @section('custom_js')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var successAlert = document.getElementById('successAlert');
-
-            if (successAlert) {
-                setTimeout(function() {
-                    successAlert.style.opacity = '0';
-                    successAlert.style.transition = 'opacity 0.5s ease-out';
-                    setTimeout(function() {
-                        successAlert.remove();
-                    }, 500);
-                }, 5000);
-            }
-        });
-
         $(document).ready(function() {
+            const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
+                  
             $('#tblCropDesease').DataTable();
 
             $('#editModal').on('show.bs.modal', function(event) {
@@ -220,26 +212,82 @@
 
                 if (cropTypeCd === '') {
                     $('#crop_type_cd').addClass('is-invalid');
-                    $('.invalid-feedback').filter('.crop-type-feedback')
-                        .show(); // Add feedback for crop type
+                    $('.invalid-feedback').filter('.crop-type-feedback').show(); // Add feedback for crop type
                     isValid = false;
                 }
-                $.ajax({
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        disease_cd: diseaseCd
-                    },
-                    success: function(response) {
-                        if (isValid) {
-                            form.off('submit').submit();
+
+
+                if (isValid) {
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: 'PUT',
+                        data: form.serialize(),
+                        dataType: 'json',
+                        success: function(response) {
+
+                            if (response.success) {
+
+                                console.log(response.cropTypes);
+
+                                // console.log(response.cropTypes.crop_type_desc);
+
+                                $('#editModal').modal('hide');
+                                $('#successAlert .alert-message').text(
+                                    response.message);
+                                $('#successAlert').removeClass('d-none')
+                                    .addClass('show');
+
+                                setTimeout(function() {
+                                    $('#successAlert')
+                                        .removeClass('show')
+                                        .addClass('d-none');
+                                }, 5000);
+
+                                const targetRow = $(
+                                    `#tblCropDesease tbody tr[data-disease-cd="${response.updatedDisease.disease_cd}"]`
+                                );
+
+                                targetRow.find('td:nth-child(2)').text(response.updatedDisease.disease_name);
+                                targetRow.find('td:nth-child(3)').text(response.updatedDisease.disease_name_as);
+                                targetRow.find('td:nth-child(4)').text(response.cropTypes);
+                                targetRow.find('td:nth-child(5)').text(response.updatedDisease.scientific_name);
+                                targetRow.find('td:nth-child(6)').text(response.updatedDisease.folder_name);
+
+                                const editButton = targetRow.find('.edit-btn');
+                                editButton.data('id', response.updatedDisease.disease_cd);
+                                editButton.data('disease-name', response.updatedDisease.disease_name);
+                                editButton.data('disease-name-as', response.updatedDisease.disease_name_as);
+                                editButton.data('folder-name', response.updatedDisease.folder_name);
+                                editButton.data('crop-type', response.updatedDisease.crop_type_cd);
+                                editButton.data('scientific-name', response.updatedDisease.scientific_name);
+
+
+                                targetRow.data('original-index', response.updatedDisease.disease_cd);
+                                var table = $('#tblCropDesease').DataTable();
+                                table.draw(false);
+                                updateSerialNumbers(table);
+                            } else {
+                                alert('Failed to update variety.');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error updating variety:', xhr
+                                .responseText);
+                            alert(
+                                'There was an error updating the variety.');
                         }
-                    },
-                    error: function(xhr) {
-                        console.error('AJAX Error:', xhr);
-                    }
-                });
+                    });
+                }
 
             });
+
+            function updateSerialNumbers(table) {
+                table.rows().every(function(index) {
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
+                });
+            }
 
             $('#deleteModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
@@ -249,24 +297,56 @@
                 modal.find('#deleteId').val(disease_cd);
             });
 
-            // Handle form submission for deletion
+
             $('#deleteForm').on('submit', function(e) {
                 e.preventDefault();
-
                 var form = $(this);
 
                 $.ajax({
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                    },
+                    url: form.attr('action'),
+                    method: 'DELETE',
+                    data: form.serialize(),
+                    dataType: 'json',
                     success: function(response) {
-                        form.off('submit').submit();
+                        if (response.success) {
+                            var rowToDelete = $('#tblCropDesease tbody tr[data-disease-cd="' +
+                                response.disease_cd + '"]');
+                            var table = $('#tblCropDesease').DataTable();
+
+                            table.row(rowToDelete).remove().draw(false);
+                            table.draw(false);
+
+                            updateSerialNumbers(table);
+
+                            $('#successAlert .alert-message').text(response.message);
+                            $('#successAlert').removeClass('d-none').addClass('show');
+
+                            setTimeout(function() {
+                                $('#successAlert').removeClass('show').addClass(
+                                    'd-none');
+                            }, 5000);
+
+                            $('#deleteModal').modal('hide');
+                        } else {
+                            console.error('Failed to delete variety:', response.message);
+                            alert('Failed to delete the variety.');
+                        }
                     },
                     error: function(xhr) {
-                        console.error('AJAX Error:', xhr);
+                        console.error('Error deleting variety:', xhr.responseText);
+                        alert('There was an error deleting the variety.');
                     }
                 });
             });
+
+
+            function updateSerialNumbers(table) {
+                table.rows().every(function(index) {
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
+                });
+            }
         });
     </script>
 @endsection

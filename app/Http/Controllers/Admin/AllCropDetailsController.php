@@ -103,7 +103,7 @@ class AllCropDetailsController extends Controller
         $cropNameCd = $validated['crop_name_cd'];
 
         // Check if a suitability record exists for the crop type and crop name
-        $existingSuitabilityRecord = DB::table('ag_crop_master_suitability')
+        $existingSuitabilityRecord = DB::table(table: 'ag_crop_master_suitability')
             ->where('crop_type_cd', $cropTypeCd)
             ->where('crop_name_cd', $cropNameCd)
             ->first();

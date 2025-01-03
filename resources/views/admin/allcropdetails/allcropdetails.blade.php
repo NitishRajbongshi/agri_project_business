@@ -52,7 +52,6 @@
                         </div>
                         <div class="form-container mt-3" id="detailsForm" style="display:none;">
                             <div class="row">
-                                <!-- Suitability Section -->
                                 <div class="col-md-4">
                                     <h6>Suitability</h6>
                                     <div class="mb-3">
@@ -192,7 +191,10 @@
 @section('custom_js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
+            const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
             var successAlert = document.getElementById('successAlert');
 
             if (successAlert) {
@@ -304,7 +306,7 @@
                 detailsForm.style.display = 'none';
                 buttonContainer.style.display = 'none';
 
-                clearFormFields(); // Clear fields when crop name changes
+                clearFormFields();
 
                 if (cropNameCd) {
                     cardContainer.style.display = 'block';

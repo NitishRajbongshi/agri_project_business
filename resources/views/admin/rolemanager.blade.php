@@ -2,7 +2,7 @@
 
 @section('title', 'Role Manager')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -21,27 +21,27 @@
               <option selected="">Select user</option>
               @forelse ($user as $item)
                 @if(!empty($item->name))
-                  <option value="{{$item->user_id}}" class="text-capitalize">{{$item->name}}</option>                
+                  <option value="{{$item->user_id}}" class="text-capitalize">{{$item->name}}</option>
                 @endif
               @empty
                   <option>No data found</option>
               @endforelse
             </select>
           </div>
-  
+
           <div class="mb-3">
               <label for="role" class="form-label">Select Role</label>
               <select class="form-select" id="role" name="role" required>
                 <option selected="">Open this select menu</option>
                 @forelse ($role as $item)
-                <option value="{{$item->role_title}}" class="text-capitalize">{{$item->role_desc}}</option>                
+                <option value="{{$item->role_title}}" class="text-capitalize">{{$item->role_desc}}</option>
               @empty
                   <option>No data found</option>
               @endforelse
-  
+
               </select>
             </div>
-  
+
             <button type="submit" class="btn btn btn-primary">Submit</button>
         </form>
       </div>
@@ -49,5 +49,14 @@
   </div>
 @endsection
 
-@section('custom_js')    
+@section('custom_js')
+<script>
+    $(document).ready( function () {
+      const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
+      $('#tblDesignation').DataTable();
+    } );
+  </script>
 @endsection

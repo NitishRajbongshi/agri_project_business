@@ -90,6 +90,10 @@ use App\Common\Activation;
 
 <script>
   $(document).ready( function () {
+    const allElements = document.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.fontSize = '14px';
+                });
     $('#tblUser').DataTable();
 
     // Change status

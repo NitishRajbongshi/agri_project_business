@@ -91,7 +91,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-
+            const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
             var successAlert = document.getElementById('successAlert');
 
             if (successAlert) {

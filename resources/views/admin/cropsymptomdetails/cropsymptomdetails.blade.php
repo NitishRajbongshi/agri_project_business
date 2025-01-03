@@ -3,12 +3,10 @@
 @section('title', 'All Crop Variety Management')
 
 @section('main')
-    @if ($message = Session::get('success'))
-        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ $message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+    <div id="successAlert" class="alert alert-success alert-dismissible fade d-none" role="alert">
+        <span class="alert-message"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
     <div class="card">
         <div class="d-flex align-items-center">
@@ -45,23 +43,42 @@
                 </select>
             </div>
 
-            <div class="table-responsive text-nowrap px-4">
-                <table class="table" id="tblUser" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th>Sl. No.</th>
-                            <th>Symptom</th>
-                            <th>Actions</th>
-                            <th>Sl. No.</th>
-                            <th>Symptom Assamese</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0" id="diseaseDetails">
+            <div class="table-container" style="display: flex; gap: 20px; justify-content: space-between;">
+                <div class="table-responsive text-nowrap px-4" style="flex: 1;">
+                    <table class="table" id="tblUser1" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>Sl. No.</th>
+                                <th>Symptom</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0" id="diseaseDetailsEn">
+                            <!-- English symptoms will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
 
-                    </tbody>
-                </table>
+                <div class="table-responsive text-nowrap px-4" style="flex: 1;">
+                    <table class="table" id="tblUser2" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>Sl. No.</th>
+                                <th>Symptom Assamese</th>
+                                <th>Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0" id="diseaseDetailsAs">
+                            <!-- Assamese symptoms will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+
+
 
             <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -78,7 +95,7 @@
                                 <div class="col mb-3">
                                     <label for="crop_type_id" class="form-label">Select Crop Type</label>
                                     <select class="form-select @error('crop_type_id') is-invalid @enderror"
-                                        id="crop_type_id" name="crop_type_cd">
+                                        id="crop_type_id" name="crop_type_id">
                                         <option value="">Select Crop Type</option>
                                         @foreach ($cropTypes as $id => $desc)
                                             <option value="{{ $id }}">{{ $desc }}</option>
@@ -116,8 +133,7 @@
 
                                 <div class="mb-3">
                                     <label for="symptom" class="form-label">Symptom</label>
-                                    <textarea rows="4" class="form-control" id="symptom" name="symptom"
-                                        placeholder="Enter Symptom"></textarea>
+                                    <textarea rows="4" class="form-control" id="symptom" name="symptom" placeholder="Enter Symptom"></textarea>
                                     <div class="invalid-feedback symptom-feedback" style="display: none;">
                                         Please provide Symptom
                                     </div>
@@ -132,14 +148,34 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal fade" id="imageModal" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="d-flex justify-content-center">
+                                <img id="modalImage1" src="" alt="Image 1" class="img-fluid mx-2"
+                                    style="max-width: 30%; max-height: 80vh; object-fit: contain;">
+                                <img id="modalImage2" src="" alt="Image 2" class="img-fluid mx-2"
+                                    style="max-width: 30%; max-height: 80vh; object-fit: contain;">
+                                <img id="modalImage3" src="" alt="Image 3" class="img-fluid mx-2"
+                                    style="max-width: 30%; max-height: 80vh; object-fit: contain;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="deleteModalLabel">Delete Suitability</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                         </div>
-                        <form id="deleteForm" method="POST" action="{{ route('admin.cropsymptomdetails.cropsymptomdetails.destroy') }}">
+                        <form id="deleteForm" method="POST"
+                            action="{{ route('admin.cropsymptomdetails.cropsymptomdetails.destroy') }}">
                             @csrf
                             @method('DELETE')
                             <div class="modal-body">
@@ -162,24 +198,17 @@
 @section('custom_js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
-            var successAlert = document.getElementById('successAlert');
-
-            if (successAlert) {
-                setTimeout(function() {
-                    successAlert.style.opacity = '0';
-                    successAlert.style.transition = 'opacity 0.5s ease-out';
-                    setTimeout(function() {
-                        successAlert.remove();
-                    }, 500);
-                }, 5000);
-            }
-
+            const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
             const cropTypeSelect = document.getElementById('crop_type_cd');
             const cropNameSelect = document.getElementById('crop_name_cd');
             const diseaseSelect = document.getElementById('disease_cd');
-            const tblUser = document.getElementById('tblUser');
-            const diseaseDetails = document.getElementById('diseaseDetails');
+            const tblUser1 = document.getElementById('tblUser1');
+            const tblUser2 = document.getElementById('tblUser2');
+            const diseaseDetailsEn = document.getElementById('diseaseDetailsEn');
+            const diseaseDetailsAs = document.getElementById('diseaseDetailsAs');
             let cropTypeCd = '';
             let cropNameCd = '';
             let diseaseCd = '';
@@ -189,8 +218,10 @@
                 cropNameSelect.innerHTML = '<option value="">Select Crop Name</option>';
                 diseaseSelect.innerHTML =
                     '<option value="">Select Disease</option>'; // Clear diseases when crop type is changed
-                tblUser.style.display = 'none';
-                diseaseDetails.innerHTML = '';
+                tblUser1.style.display = 'none';
+                tblUser2.style.display = 'none';
+                diseaseDetailsEn.innerHTML = '';
+                diseaseDetailsAs.innerHTML = '';
                 if (cropTypeCd) {
                     fetch(`/admin/crop-name?crop_type_cd=${cropTypeCd}`)
                         .then(response => response.json())
@@ -219,8 +250,10 @@
                 cropNameCd = this.value;
                 diseaseSelect.innerHTML =
                     '<option value="">Select Disease</option>'; // Reset disease dropdown
-                tblUser.style.display = 'none';
-                diseaseDetails.innerHTML = '';
+                tblUser1.style.display = 'none';
+                tblUser2.style.display = 'none';
+                diseaseDetailsEn.innerHTML = '';
+                diseaseDetailsAs.innerHTML = '';
                 if (cropNameCd) {
                     fetch(`/admin/disease?crop_name_cd=${cropNameCd}`)
                         .then(response => response.json())
@@ -234,8 +267,8 @@
                                 const option = document.createElement('option');
                                 option.value = key;
                                 option.textContent = value
-                                    .toUpperCase(); // Convert crop name to uppercase
-                                    diseaseSelect.appendChild(option);
+                                    .toUpperCase();
+                                diseaseSelect.appendChild(option);
                             });
                         })
                         .catch(error => console.error('Error fetching diseases:', error));
@@ -247,124 +280,102 @@
 
             diseaseSelect.addEventListener('change', function() {
                 diseaseCd = this.value;
-                tblUser.style.display = 'none';
-                diseaseDetails.innerHTML = '';
+                tblUser1.style.display = 'none';
+                tblUser2.style.display = 'none';
+                diseaseDetailsEn.innerHTML = '';
+                diseaseDetailsAs.innerHTML = '';
 
                 if (diseaseCd) {
-                    fetch(`/admin/crop-disease-symptom?disease_cd=${diseaseCd}`)
+                    fetch(`/admin/crop-disease-symptom?disease_cd=${diseaseCd}&crop_name_cd=${cropNameCd}`)
                         .then(response => response.json())
                         .then(data => {
-
-                            if (data.en || data.as) {
-                                let englishSymptoms = data.en || [];
-                                let assameseSymptoms = data.as || [];
-
-                                // Counters for each language
-                                let englishCount = 1;
-                                let assameseCount = 1;
-
-                                // Get the maximum length of both language arrays
-                                let maxLength = Math.max(englishSymptoms.length, assameseSymptoms
-                                    .length);
-
-                                // Loop through both arrays and add them to the table
-                                for (let i = 0; i < maxLength; i++) {
-
-                                    let englishSymptom = englishSymptoms[i] ? englishSymptoms[i]
-                                        .symptom : '';
-                                    let assameseSymptom = assameseSymptoms[i] ? assameseSymptoms[i]
-                                        .symptom : '';
-                                    let englishId = englishSymptoms[i] ? englishSymptoms[i].id :
-                                    ''; // Get the English symptom ID
-                                    let assameseId = assameseSymptoms[i] ? assameseSymptoms[i].id :
-                                    ''; // Get the Assamese symptom ID
+                            console.log('Fetched data:', data); // Log the response data for debugging
 
 
-                                    // Create a row only if there is a symptom in either language
-                                    let row = '<tr>';
-
-                                    // Check if there's an English symptom to add
-                                    if (englishSymptom) {
-                                        row += `
-                                <td>${englishCount}</td>
-                                <td style="overflow-wrap: break-word; white-space: normal;">${englishSymptom}</td>
-                                <td>
+                            diseaseDetailsEn.innerHTML = '';
+                            diseaseDetailsAs.innerHTML = '';
 
 
-                                    <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
-                                        data-bs-target="#editModal"
-                                        data-id="${englishId}"
-                                        data-disease-cd="${diseaseCd}"
-                                        data-symptom="${englishSymptom}"
-                                        data-crop-name="${cropNameCd}"
-                                        data-crop-type-cd="${cropTypeCd}"
-                                        data-language_cd="en">
-                                            <i class="tf-icons bx bx-edit"></i> Edit
-                                        </a>
-
-
-                                        <a href="#" class="btn btn-sm btn-outline-danger delete-btn" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal" data-id="${englishId}">
-                                                <i class="tf-icons bx bx-trash"></i>
-                                            </a>
-                                </td>
-                            `;
-                                        englishCount++; // Increment the English counter
-                                    } else {
-                                        row += `
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            `;
-                                    }
-
-                                    // Check if there's an Assamese symptom to add
-                                    if (assameseSymptom) {
-                                        row += `
-                                <td>${assameseCount}</td>
-                                <td style="overflow-wrap: break-word; white-space: normal;">${assameseSymptom}</td>
-                                <td>
-                                   <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
-                                        data-bs-target="#editModal"
-                                        data-id="${assameseId}"
-                                        data-disease-cd="${diseaseCd}"
-                                        data-symptom="${assameseSymptom}"
-                                        data-crop-name="${cropNameCd}"
-                                        data-crop-type-cd="${cropTypeCd}"
-                                        data-language_cd="as">
-                                            <i class="tf-icons bx bx-edit"></i> Edit
-                                        </a>
-                                     <a href="#" class="btn btn-sm btn-outline-danger delete-btn" data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal" data-id="${assameseId}">
-                                                <i class="tf-icons bx bx-trash"></i>
-                                            </a>
-                                </td>
-                            `;
-                                        assameseCount++; // Increment the Assamese counter
-                                    } else {
-                                        row += `
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            `;
-                                    }
-
-                                    // Close the row
-                                    row += '</tr>';
-
-                                    // Insert the row into the table
-                                    diseaseDetails.insertAdjacentHTML('beforeend', row);
-                                }
-
-                                tblUser.style.display = 'table';
-                                $('#tblUser').DataTable();
+                            if (data.en && data.en.length) {
+                                data.en.forEach((item, index) => {
+                                    const row = `
+                    <tr data-id="${item.id}" data-original-index="${index + 1}">
+                        <td>${index + 1}</td>
+                        <td style="overflow-wrap: break-word; white-space: normal;">${item.symptom}</td>
+                        <td><a href="#" class="text-primary font-weight-bold text-decoration-underline view-images-link" data-item="${item.imagepath1 || ''};${item.imagepath2 || ''};${item.imagepath3 || ''}">View Images</a></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
+                               data-bs-target="#editModal"
+                               data-id="${item.id}"
+                               data-disease-cd="${diseaseCd}"
+                               data-symptom="${item.symptom}"
+                               data-crop-name="${cropNameCd}"
+                               data-crop-type-cd="${cropTypeCd}"
+                               data-language_cd="${item.language_cd}">
+                               <i class="tf-icons bx bx-edit"></i> Edit
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-danger delete-btn" data-bs-toggle="modal"
+                               data-bs-target="#deleteModal" data-id="${item.id}">
+                               <i class="tf-icons bx bx-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    `;
+                                    diseaseDetailsEn.insertAdjacentHTML('beforeend', row);
+                                });
                             } else {
-                                console.log('No symptoms found for the selected disease');
+                                console.log('No English symptoms found for the selected disease');
+                                diseaseDetailsEn.innerHTML =
+                                    '<tr><td colspan="3" class="text-center">No English symptoms found for the selected disease.</td></tr>';
                             }
+
+                            if (data.as && data.as.length) {
+                                data.as.forEach((item, index) => {
+                                    const row = `
+                    <tr data-id="${item.id}" data-original-index="${index + 1}">
+                        <td>${index + 1}</td>
+                        <td style="overflow-wrap: break-word; white-space: normal;">${item.symptom}</td>
+                          <td><a href="#" class="text-primary font-weight-bold text-decoration-underline view-images-link" data-item="${item.imagepath1 || ''};${item.imagepath2 || ''};${item.imagepath3 || ''}">View Images</a></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
+                               data-bs-target="#editModal"
+                               data-id="${item.id}"
+                               data-disease-cd="${diseaseCd}"
+                               data-symptom="${item.symptom}"
+                               data-crop-name="${cropNameCd}"
+                               data-crop-type-cd="${cropTypeCd}"
+                               data-language_cd="${item.language_cd}">
+                               <i class="tf-icons bx bx-edit"></i> Edit
+                            </a>
+                            <a href="#" class="btn btn-sm btn-outline-danger delete-btn" data-bs-toggle="modal"
+                               data-bs-target="#deleteModal" data-id="${item.id}">
+                               <i class="tf-icons bx bx-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                    `;
+                                    diseaseDetailsAs.insertAdjacentHTML('beforeend', row);
+                                });
+                            } else {
+                                console.log('No Assamese symptoms found for the selected disease');
+                                '<tr><td colspan="3" class="text-center">No Assamese symptoms found for the selected disease.</td></tr>';
+                            }
+
+
+                            tblUser1.style.display = 'table';
+                            tblUser2.style.display = 'table';
+
+
+                            $('#tblUser1').DataTable();
+                            $('#tblUser2').DataTable();
                         })
                         .catch(error => console.error('Error fetching disease symptoms:', error));
                 }
+
+
+
             });
+
 
             $('#editModal').on('show.bs.modal', function(event) {
                 const button = $(event.relatedTarget); // Button that triggered the modal
@@ -476,10 +487,6 @@
                 $('#disease_id').removeClass('is-invalid');
                 $('.invalid-feedback').hide();
 
-                console.log(cropNameCd);
-                console.log(cropTypeCd);
-                console.log(diseaseCd);
-
 
                 if (cropTypeCd === '') {
                     $('#crop_type_id').addClass('is-invalid');
@@ -506,10 +513,92 @@
                 }
 
                 if (isValid) {
-                    form.off('submit').submit();
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: 'PUT',
+                        data: form.serialize(),
+                        dataType: 'json',
+                        success: function(response) {
+
+                            if (response.success) {
+
+                                console.log(response);
+
+                                $('#editModal').modal('hide');
+                                $('#successAlert .alert-message').text(
+                                    response.message);
+                                $('#successAlert').removeClass('d-none')
+                                    .addClass('show');
+
+                                setTimeout(function() {
+                                    $('#successAlert')
+                                        .removeClass('show')
+                                        .addClass('d-none');
+                                }, 5000);
+
+                                const targetRow1 = $(
+                                    `#tblUser1 tbody tr[data-id="${response.updatedSymptom.id}"]`
+                                    );
+                                targetRow1.find('td:nth-child(2)').text(response.updatedSymptom
+                                    .symptom);
+                                const editButton1 = targetRow1.find('.edit-btn');
+                                editButton1.data('id', response.updatedSymptom.id);
+                                editButton1.data('disease-cd', response.updatedSymptom
+                                    .crop_disease_cd);
+                                editButton1.data('symptom', response.updatedSymptom.symptom);
+                                editButton1.data('crop-name', response.cropname);
+                                editButton1.data('crop-type-cd', response.croptype);
+                                editButton1.data('language_cd', response.updatedSymptom
+                                    .language_cd);
+
+                                targetRow1.data('original-index', response.updatedSymptom.id);
+                                var table1 = $('#tblUser1').DataTable();
+                                table1.draw(false);
+                                updateSerialNumbers(table1);
+
+
+                                const targetRow2 = $(
+                                    `#tblUser2 tbody tr[data-id="${response.updatedSymptom.id}"]`
+                                    );
+
+                                targetRow2.find('td:nth-child(2)').text(response.updatedSymptom
+                                    .symptom);
+                                const editButton2 = targetRow2.find('.edit-btn');
+                                editButton2.data('id', response.updatedSymptom.id);
+                                editButton2.data('disease-cd', response.updatedSymptom
+                                    .crop_disease_cd);
+                                editButton2.data('symptom', response.updatedSymptom.symptom);
+                                editButton2.data('crop-name', response.cropname);
+                                editButton2.data('crop-type-cd', response.croptype);
+                                editButton2.data('language_cd', response.updatedSymptom
+                                    .language_cd);
+
+                                targetRow2.data('original-index', response.updatedSymptom.id);
+                                var table2 = $('#tblUser2').DataTable();
+                                table2.draw(false);
+                                updateSerialNumbers(table2);
+
+                            } else {
+                                alert('Failed to update variety.');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error updating variety:', xhr
+                                .responseText);
+                            alert(
+                                'There was an error updating the variety.');
+                        }
+                    });
                 }
             });
 
+            function updateSerialNumbers(table) {
+                table.rows().every(function(index) {
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
+                });
+            }
 
             $('#deleteModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
@@ -519,25 +608,190 @@
                 modal.find('#deleteId').val(id);
             });
 
-            // Handle form submission for deletion
+
             $('#deleteForm').on('submit', function(e) {
                 e.preventDefault();
-
                 var form = $(this);
 
                 $.ajax({
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                    },
+                    url: form.attr('action'),
+                    method: 'DELETE',
+                    data: form.serialize(),
+                    dataType: 'json',
                     success: function(response) {
-                        form.off('submit').submit();
+
+
+                        if (response.success) {
+                            var rowToDeleteUser1 = $('#tblUser1 tbody tr[data-id="' + response
+                                .id + '"]');
+                            var tableUser1 = $('#tblUser1').DataTable();
+                            tableUser1.row(rowToDeleteUser1).remove().draw(false);
+
+                            // Remove from tblUser2
+                            var rowToDeleteUser2 = $('#tblUser2 tbody tr[data-id="' + response
+                                .id + '"]');
+                            var tableUser2 = $('#tblUser2').DataTable();
+                            tableUser2.row(rowToDeleteUser2).remove().draw(false);
+
+                            // Redraw both tables
+                            tableUser1.draw(false);
+                            tableUser2.draw(false);
+
+                            updateSerialNumbers(tableUser1);
+                            updateSerialNumbers(tableUser2);
+
+                            $('#successAlert .alert-message').text(response.message);
+                            $('#successAlert').removeClass('d-none').addClass('show');
+
+                            setTimeout(function() {
+                                $('#successAlert').removeClass('show').addClass(
+                                    'd-none');
+                            }, 5000);
+
+                            $('#deleteModal').modal('hide');
+                        } else {
+                            console.error('Failed to delete variety:', response.message);
+                            alert('Failed to delete the variety.');
+                        }
                     },
                     error: function(xhr) {
-                        console.error('AJAX Error:', xhr);
+                        console.error('Error deleting variety:', xhr.responseText);
+                        alert('There was an error deleting the variety.');
                     }
                 });
             });
 
+
+            function updateSerialNumbers(table) {
+                console.log('Updating serial numbers for table:', table);
+                table.rows().every(function(index) {
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
+                });
+            }
+
+                 diseaseDetailsEn.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('a.view-images-link')) {
+                    try {
+
+                        const item = e.target.getAttribute('data-item');
+
+
+                        const imagePaths = item.split(';');
+
+
+
+                        const image1 = imagePaths[0] ||
+                            ''; // First image path (empty string if not available)
+                        const image2 = imagePaths[1] ||
+                            ''; // Second image path (empty string if not available)
+                        const image3 = imagePaths[2] ||
+                            ''; // Third image path (empty string if not available)
+
+
+
+
+                        const modalElement = document.getElementById(
+                            'imageModal');
+
+                        modalElement.addEventListener('hidden.bs.modal',
+                            function() {
+                                // Reset the body's overflow property to allow scrolling after modal is hidden
+                                document.body.style.overflow =
+                                    'auto'; // Allow scrolling
+                            });
+                        const existingModal = bootstrap.Modal.getInstance(
+                            modalElement);
+                        if (existingModal) {
+                            existingModal
+                                .dispose(); // Dispose of the existing modal instance
+                        }
+
+                        // Reinitialize the modal instance
+                        const newImageModal = new bootstrap.Modal(
+                            modalElement);
+
+
+                        // Set the images in the modal
+                        document.getElementById('modalImage1').src =
+                            image1 || '';
+                        document.getElementById('modalImage2').src =
+                            image2 || '';
+                        document.getElementById('modalImage3').src =
+                            image3 || '';
+
+
+
+                        if (newImageModal) {
+                            newImageModal.show(); // Show the modal
+                        }
+                    } catch (error) {
+                        console.error('Error parsing item:', error);
+                    }
+                }
+            });
+
+                diseaseDetailsAs.addEventListener('click', function(e) {
+                    if (e.target && e.target.matches('a.view-images-link')) {
+                    try {
+
+                        const item = e.target.getAttribute('data-item');
+
+
+                        const imagePaths = item.split(';');
+
+
+
+                        const image1 = imagePaths[0] ||
+                            ''; // First image path (empty string if not available)
+                        const image2 = imagePaths[1] ||
+                            ''; // Second image path (empty string if not available)
+                        const image3 = imagePaths[2] ||
+                            ''; // Third image path (empty string if not available)
+
+
+
+
+                        const modalElement = document.getElementById(
+                            'imageModal');
+
+                        modalElement.addEventListener('hidden.bs.modal',
+                            function() {
+                                // Reset the body's overflow property to allow scrolling after modal is hidden
+                                document.body.style.overflow =
+                                    'auto'; // Allow scrolling
+                            });
+                        const existingModal = bootstrap.Modal.getInstance(
+                            modalElement);
+                        if (existingModal) {
+                            existingModal
+                                .dispose(); // Dispose of the existing modal instance
+                        }
+
+                        // Reinitialize the modal instance
+                        const newImageModal = new bootstrap.Modal(
+                            modalElement);
+
+
+                        // Set the images in the modal
+                        document.getElementById('modalImage1').src =
+                            image1 || '';
+                        document.getElementById('modalImage2').src =
+                            image2 || '';
+                        document.getElementById('modalImage3').src =
+                            image3 || '';
+
+
+
+                        if (newImageModal) {
+                            newImageModal.show(); // Show the modal
+                        }
+                    } catch (error) {
+                        console.error('Error parsing item:', error);
+                    }
+                }
+            });
         });
     </script>
 @endsection

@@ -6,12 +6,18 @@
 @endsection
 
 @section('main')
+    @if ($message = Session::get('success'))
+        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ $message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Add Recommendation</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.appmaster.createrecommendation') }}" method="POST" autocomplete="off">
+            <form id="croprecomForm" action="{{ route('admin.appmaster.createrecommendation') }}" method="POST" autocomplete="off">
                 @csrf
                 <div class="mb-3">
                     <label class="form-label" for="crop_name_cd">Crop Name</label>
@@ -24,11 +30,9 @@
                             </option>
                         @endforeach
                     </select>
-                    @error('crop_name_cd')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
+                    <div class="invalid-feedback crop_name_cd-feedback" style="display: none;">
+                        Please provide Crop Name
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -41,11 +45,9 @@
                             </option>
                         @endforeach
                     </select>
-                    @error('disease_cd')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
+                    <div class="invalid-feedback disease_cd-feedback" style="display: none;">
+                        Please provide Disease Name
+                    </div>
                 </div>
 
 
@@ -53,11 +55,9 @@
                     <label class="form-label" for="control_measure">Control Measure</label>
                     <textarea rows="4" class="form-control @error('control_measure') is-invalid @enderror" id="control_measure"
                         name="control_measure" placeholder="Control Measure" value="{{ old('control_measure') }}"></textarea>
-                    @error('control_measure')
-                        <div class="invalid-feedback">
-                            {{ $message }}
+                        <div class="invalid-feedback control_measure-feedback" style="display: none;">
+                            Please provide Control Measure
                         </div>
-                    @enderror
                 </div>
 
                 <div class="mb-3">
@@ -72,4 +72,66 @@
     </div>
 @endsection
 @section('custom_js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
+                  
+        var successAlert = document.getElementById('successAlert');
+
+        if (successAlert) {
+            setTimeout(function() {
+                successAlert.style.opacity = '0';
+                successAlert.style.transition = 'opacity 0.5s ease-out';
+                setTimeout(function() {
+                    successAlert.remove();
+                }, 500);
+            }, 5000);
+        }
+
+    });
+
+
+    $('#croprecomForm').on('submit', function(e) {
+        e.preventDefault();
+        var isValid = true;
+
+        var cropNameCd = $('#crop_name_cd').val().trim();
+        var diseaseName = $('#disease_cd').val().trim();
+        var controlMeasure = $('#control_measure').val().trim();
+        var form = $(this);
+
+
+        $('#crop_name_cd').removeClass('is-invalid');
+        $('#disease_cd').removeClass('is-invalid');
+        $('#control_measure').removeClass('is-invalid');
+        $('.invalid-feedback').hide();
+
+
+        if (cropNameCd === '') {
+            $('#crop_name_cd').addClass('is-invalid');
+            $('.invalid-feedback.crop_name_cd-feedback').show();
+            isValid = false;
+        }
+
+        if (diseaseName === '') {
+            $('#disease_cd').addClass('is-invalid');
+            $('.invalid-feedback.disease_cd-feedback').show();
+            isValid = false;
+        }
+
+        if (controlMeasure === '') {
+            $('#control_measure').addClass('is-invalid');
+            $('.invalid-feedback.control_measure-feedback').show();
+            isValid = false;
+        }
+
+        if (isValid) {
+            form.off('submit').submit();
+        }
+    });
+</script>
 @endsection

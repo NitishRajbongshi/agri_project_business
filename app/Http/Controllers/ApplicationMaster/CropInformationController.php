@@ -49,7 +49,17 @@ class CropInformationController extends Controller
                 'updated_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-        return redirect()->route('admin.appmaster.cropinformation')->with('success', 'Crop information updated successfully.');
+        $updatedCropName = DB::table('ag_crop_name_master')
+            ->where('crop_name_cd', $validated['crop_name_cd'])
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Crop information updated successfully.',
+            'updatedCropName' => $updatedCropName
+        ]);
+
+        // return redirect()->route('admin.appmaster.cropinformation')->with('success', 'Crop information updated successfully.');
     }
 
 
@@ -110,7 +120,9 @@ class CropInformationController extends Controller
                 'created_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-            return redirect()->route('admin.appmaster.cropinformation')->with('success', 'Crop information created successfully.');
+            // return redirect()->route('admin.appmaster.cropinformation')->with('success', 'Crop information created successfully.');
+
+            return redirect()->back()->with('success', 'Crop information created successfully.');
         }
 
         // Fetch crop types for the dropdown
@@ -135,6 +147,12 @@ class CropInformationController extends Controller
             ->where('crop_name_cd', $validated['crop_name_cd'])
             ->delete();
 
-        return redirect()->route('admin.appmaster.cropinformation')->with('success', 'Crop information deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Crop information deleted successfully.',
+            'crop_name_cd' => $validated['crop_name_cd']
+        ]);
+
+        // return redirect()->route('admin.appmaster.cropinformation')->with('success', 'Crop information deleted successfully.');
     }
 }

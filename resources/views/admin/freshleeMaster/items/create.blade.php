@@ -1,6 +1,6 @@
 @extends('admin.common.layout')
 
-@section('title', 'Create Crop')
+@section('title', 'Create Item')
 
 @section('custom_header')
 @endsection
@@ -24,7 +24,7 @@
                     <div class="mb-3 col-sm-12 col-md-6">
                         <label class="form-label" for="item_name">Item Name</label>
                         <input type="text" class="form-control @error('item_name') is-invalid @enderror" id="item_name"
-                            name="item_name" placeholder="Crop Name" value="{{ old('item_name') }}">
+                            name="item_name" placeholder="Item Name" value="{{ old('item_name') }}">
                         @error('item_name')
                             <div class="invalid-feedback">
                                 {{ $message }}
@@ -85,7 +85,7 @@
                     <div class="mb-3 col-sm-12 col-md-6">
                         <label class="form-label" for="farm_life_in_days">Farm Life (days)</label>
                         <input type="number" class="form-control @error('farm_life_in_days') is-invalid @enderror"
-                            id="farm_life_in_days" name="farm_life_in_days" placeholder="Crop Name"
+                            id="farm_life_in_days" name="farm_life_in_days" placeholder="Farm Life"
                             value="{{ old('farm_life_in_days') }}">
                         @error('farm_life_in_days')
                             <div class="invalid-feedback">
@@ -96,7 +96,7 @@
                     <div class="mb-3 col-sm-12 col-md-6">
                         <label class="form-label" for="min_qty_to_order">Min Order Quantity</label>
                         <input type="number" class="form-control @error('min_qty_to_order') is-invalid @enderror"
-                            id="min_qty_to_order" name="min_qty_to_order" placeholder="Crop Name"
+                            id="min_qty_to_order" name="min_qty_to_order" placeholder="Min Order Quantity"
                             value="{{ old('min_qty_to_order') }}">
                         @error('min_qty_to_order')
                             <div class="invalid-feedback">

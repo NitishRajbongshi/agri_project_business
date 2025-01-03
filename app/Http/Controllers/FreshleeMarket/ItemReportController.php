@@ -13,7 +13,7 @@ class ItemReportController extends Controller
 {
     public function __construct()
     {
-        Log::info('ItemController Initialized');
+        Log::info('ItemReportController Initialized');
     }
 
     public function index()

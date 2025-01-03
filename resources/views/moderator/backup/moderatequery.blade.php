@@ -2,7 +2,7 @@
 
 @section('title', 'Moderate Queries')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -11,7 +11,7 @@
     <div class="d-flex align-items-center">
         <h5 class="card-header">Query Viewer</h5>
         <div>
-            <button type="button" class="btn btn-outline-success" id="queryCategoryManagerBtn" data-bs-toggle="modal" 
+            <button type="button" class="btn btn-outline-success" id="queryCategoryManagerBtn" data-bs-toggle="modal"
             data-bs-target="#manageQueryCategoryModal">
               <i class="tf-icons bx bx-plus-medical"></i>
                 Add New Query Category
@@ -50,7 +50,7 @@
                     @endif
                   </td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn" 
+                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -60,8 +60,8 @@
                     data-district = "{{ $item->district }}"
                     data-toggle="tooltip" data-placement="top" title="View Query">
                     <i class='bx bx-show'></i></button>
-  
-                    <button class="btn btn-sm btn-outline-success OpenAcceptModalBtn" 
+
+                    <button class="btn btn-sm btn-outline-success OpenAcceptModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -72,7 +72,7 @@
                     data-toggle="tooltip" data-placement="top" title="Accept Query">
                     <i class='bx bx-check-circle'></i></button>
 
-                    <button class="btn btn-sm btn-outline-danger OpenRejectModalBtn" 
+                    <button class="btn btn-sm btn-outline-danger OpenRejectModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -84,12 +84,12 @@
                     <i class='bx bx-x-circle'></i></button>
                   </td>
                 </tr>
-              @empty 
+              @empty
                 <tr>
                     <td colspan="3">No data found</td>
                 </tr>
-              @endforelse 
-            
+              @endforelse
+
           </tbody>
         </table>
       </div>
@@ -103,8 +103,8 @@
         <h5 class="modal-title" >View Question</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      
-      
+
+
         <form id="formCreateCategory">
           @csrf
           <div class="modal-body" >
@@ -117,8 +117,8 @@
             </div>
 
           </div>
-              
-                         
+
+
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
               Close
@@ -140,7 +140,7 @@
             <h5 class="modal-title" >View Question</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          
+
           <div class="modal-body">
 
             <div class="table-responsive text-wrap">
@@ -157,15 +157,15 @@
                 </tbody>
               </table>
 
-            </div> 
+            </div>
           </div>
           <div class="modal-footer">
-           
+
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
               Close
             </button>
           </div>
-         
+
         </div>
       </div>
     </div>
@@ -178,7 +178,7 @@
             <h5 class="modal-title" >Accept Question</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          
+
           <div class="modal-body">
 
             <div class="table-responsive text-wrap">
@@ -194,10 +194,10 @@
                   </tr>
                 </tbody>
               </table>
-            </div> 
+            </div>
 
-            <form id="formAcceptQuery">    
-              @csrf                   
+            <form id="formAcceptQuery">
+              @csrf
                  <input type="hidden" id="accept_query_id" name="accept_query_id"  value="">
                  <div class="row">
                   <label for="queryCategorySelect" class="col-sm-3 col-form-label"><strong> Category: </strong></label>
@@ -205,7 +205,7 @@
                       <select class="form-select" id="queryCategorySelect" name="queryCategorySelect" aria-label="Select Query Category" required>
                         <option selected value="" >Select Category</option>
                         @foreach ($categories as $category)
-                          <option value="{{ $category->catg_id }}">{{ $category->catg_descr }}</option>  
+                          <option value="{{ $category->catg_id }}">{{ $category->catg_descr }}</option>
                         @endforeach
                       </select>
                     </div>
@@ -217,9 +217,9 @@
                       <textarea rows="4" class="form-control" id="queryAnswer" name="queryAnswer" aria-label="Write an answer"></textarea>
                   </div>
                  </div>
-          </div>   
+          </div>
           {{-- End of Modal Body --}}
-          
+
           <div class="modal-footer">
 
             <button type="submit" class="btn btn-success" id="acceptQuerybtn" >
@@ -229,7 +229,7 @@
               Close
             </button>
           </div>
-        </form> 
+        </form>
 
         </div>
       </div>
@@ -243,7 +243,7 @@
             <h5 class="modal-title" >Reject Question</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          
+
           <div class="modal-body">
 
             <div class="table-responsive text-wrap">
@@ -258,17 +258,17 @@
                 </tbody>
               </table>
             </div>
-            
-            <form id="formRejectQuery">    
-              @csrf                   
+
+            <form id="formRejectQuery">
+              @csrf
                  <input type="hidden" id="reject_query_id" name="reject_query_id"  value="">
                  <div class="row">
                   <label for="queryRejectReason" class="col-sm-2 col-form-label"><strong> Reason: </strong></label>
                   <div class="col-sm-10">
                     <div class="input-group input-group-merge">
                       <span id="queryRejectReasonIcon" class="input-group-text"><i class="bx bx-comment"></i></span>
-                      <textarea id="queryRejectReason" name="queryRejectReason" class="form-control" placeholder="Please give reason for rejecting the query" required></textarea>                      
-                    </div>                    
+                      <textarea id="queryRejectReason" name="queryRejectReason" class="form-control" placeholder="Please give reason for rejecting the query" required></textarea>
+                    </div>
                   </div>
                 </div>
           </div>
@@ -283,18 +283,25 @@
 
             </form>
           </div>
-         
+
         </div>
       </div>
     </div>
 @endsection
 
-@section('custom_js')  
+@section('custom_js')
 
 <script>
 
     // Open View Modal
     $(document).ready( function () {
+
+        const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
+       
+
         $('#tblQueries').DataTable();
 
         $('#queryCategoryManagerBtn').on('click', function(){
@@ -386,7 +393,7 @@
 
       // Accept Query AJAX
       $('#acceptQuerybtn').click(function(e){
-        e.preventDefault(); 
+        e.preventDefault();
           $.ajax({
               url: '{{ route('moderator.acceptquery') }}',
               data: $("#formAcceptQuery").serialize(),
@@ -404,17 +411,17 @@
                 else if(data.status == 0) {
                   alert(data.message);
                 }
-              }, 
+              },
               error: function(){
                     alert("Query moderation failed.Something went wrong!");
               }
-          }); 
+          });
         });
 
 
         // Reject Query AJAX
       $('#rejectQuerybtn').click(function(e){
-        e.preventDefault(); 
+        e.preventDefault();
           $.ajax({
               url: '{{ route('moderator.rejectquery') }}',
               data: $("#formRejectQuery").serialize(),
@@ -432,11 +439,11 @@
                 else if( data.status == 0) {
                   alert(data.message);
                 }
-              }, 
+              },
               error: function(){
                     alert("Query moderation failed. Something went wrong!");
               }
-          }); 
+          });
         });
 
         $(function () {
@@ -445,7 +452,7 @@
 
     } );
 
-    
-</script> 
+
+</script>
 @endsection
 

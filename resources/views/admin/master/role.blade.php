@@ -2,7 +2,7 @@
 
 @section('title', 'Role Master')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -28,8 +28,8 @@
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
-          
-            @forelse ($roles as $index => $item) 
+
+            @forelse ($roles as $index => $item)
                 <tr>
                     <td>
                     <strong>{{$index + 1}}</strong>
@@ -37,23 +37,23 @@
                     <td>{{$item->role_title}}</td>
                     <td>{{$item->role_desc}}</td>
                     <td>
-                    <button class="btn btn-outline-primary btn-sm OpenEditModalBtn" 
+                    <button class="btn btn-outline-primary btn-sm OpenEditModalBtn"
                     data-id="{{Crypt::encrypt($item->id)}}"
                     data-role_title="{{$item->role_title}}"
                     data-role_desc ="{{$item->role_desc}}">
                     <i class='bx bx-edit'></i>Edit</button>
 
-                    <button class="btn btn-sm btn-outline-danger deleteBtn" 
+                    <button class="btn btn-sm btn-outline-danger deleteBtn"
                     data-id="{{Crypt::encrypt($item->id)}}">
                     <i class='bx bx-trash'></i>Delete</button>
                     </td>
                 </tr>
-            @empty 
+            @empty
                 <tr>
                     <td colspan="3">No data found</td>
                 </tr>
-            @endforelse 
-          
+            @endforelse
+
         </tbody>
       </table>
     </div>
@@ -117,8 +117,8 @@
                   <div class="col mb-3">
                     <input type="hidden" name="role_id" id="role_id" value="">
                     <label for="edit_role_title" class="form-label">Role title</label>
-                    <input type="text" id="edit_role_title" name="edit_role_title" 
-                    class="form-control @error('edit_role_title') is-invalid @enderror" 
+                    <input type="text" id="edit_role_title" name="edit_role_title"
+                    class="form-control @error('edit_role_title') is-invalid @enderror"
                     placeholder="Enter Role Title" required>
                   </div>
                 </div>
@@ -146,7 +146,7 @@
 @endsection
 
 
-@section('custom_js')   
+@section('custom_js')
 
 <script>
     $('#createRoleForm').on('submit', function(e) {
@@ -232,6 +232,10 @@
 
 <script>
   $(document).ready( function () {
+    const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
     $('#tblRole').DataTable();
   } );
 </script>

@@ -4,10 +4,9 @@
 
 @section('main')
     <div id="successAlert" class="alert alert-success alert-dismissible fade d-none" role="alert">
-        <span class="alert-message"></span> <!-- The success message will be inserted here -->
+        <span class="alert-message"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-
 
     <div class="card">
         <div class="d-flex align-items-center">
@@ -155,6 +154,10 @@
 @section('custom_js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
             const cropTypeSelect = document.getElementById('crop_type_cd');
             const cropNameSelect = document.getElementById('crop_name_cd');
             const tblUser = document.getElementById('tblUser');
@@ -273,6 +276,12 @@
                 modal.find('#cropVarietyDetails').val(cropVarietyDtls);
                 modal.find('#cropVarietyDetailsAs').val(cropVarietyDtlsAs);
 
+                console.log('Modal opened with data:', {
+                    cropVarietyDesc,
+                    cropVarietyDescAs,
+                    cropVarietyDtls,
+                    cropVarietyDtlsAs
+                });
 
                 fetchCropNames(cropTypeCd, cropNameCd);
             });
@@ -397,6 +406,21 @@
                                 targetRow.find('td:nth-child(5)').text(response.updatedVariety
                                     .crop_variety_dtls_as); // Column 5: Details AS
 
+                                const editButton = targetRow.find('.edit-btn');
+                                editButton.data('crop-variety-desc', response.updatedVariety
+                                    .crop_variety_desc);
+                                editButton.data('crop-variety-desc-as', response.updatedVariety
+                                    .crop_variety_desc_as);
+                                editButton.data('crop-variety-dtls', response.updatedVariety
+                                    .crop_variety_dtls);
+                                editButton.data('crop-variety-dtls-as', response.updatedVariety
+                                    .crop_variety_dtls_as);
+
+                                // Update other data attributes if necessary
+                                editButton.data('crop-name', response.updatedVariety.crop_name);
+                                editButton.data('crop-type-cd', response.updatedVariety
+                                    .crop_type_cd);
+
                                 // Optionally, update other data attributes if needed (if you're using them for further logic)
                                 targetRow.data('original-index', response.updatedVariety
                                     .crop_variety_cd); // Update data attribute (if needed)
@@ -405,6 +429,8 @@
                                 var table = $('#tblUser').DataTable();
                                 table.draw(false); // Ensure the page stays the same
                                 updateSerialNumbers(table); // Manually update serial numbers
+
+
 
                             } else {
                                 alert('Failed to update variety.');
@@ -418,17 +444,14 @@
                 }
             });
 
-            // Function to update serial numbers for all rows
+
             function updateSerialNumbers(table) {
                 table.rows().every(function(index) {
-                    var row = this.node(); // Get the row element
-                    var serialNumber = index + 1; // Serial number is 1-based
-                    $(row).find('td:first').text(serialNumber); // Update serial number in the first column
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
                 });
             }
-
-
-
 
             $('#deleteModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
@@ -452,26 +475,19 @@
                         console.log('Response:', response);
 
                         if (response.success) {
-                            // Find the row to delete based on the crop_variety_cd
-                            var rowToDelete = $('#tblUser tbody tr[data-variety-cd="' + response
-                                .crop_variety_cd + '"]');
-                            var table = $('#tblUser').DataTable(); // Get the DataTable instance
 
-                            // Remove the row from the DataTable
-                            table.row(rowToDelete).remove().draw(
-                                false); // Draw without resetting pagination
+                            var rowToDelete = $('#tblUser tbody tr[data-variety-cd="' + response.crop_variety_cd + '"]');
+                            var table = $('#tblUser').DataTable();
 
-                            // Force the DataTable to redraw
-                            table.draw(false); // Make sure pagination doesn't reset
 
-                            // After deletion, update the serial numbers across all pages
+                            table.row(rowToDelete).remove().draw(false);
+                            table.draw(false);
+
                             updateSerialNumbers(table);
 
-                            // Show success message in the alert
                             $('#successAlert .alert-message').text(response.message);
                             $('#successAlert').removeClass('d-none').addClass('show');
 
-                            // Optionally, hide the alert after 5 seconds
                             setTimeout(function() {
                                 $('#successAlert').removeClass('show').addClass(
                                     'd-none');
@@ -490,37 +506,14 @@
                 });
             });
 
-            // Update serial numbers dynamically across all pages after deletion
+
             function updateSerialNumbers(table) {
-                // Loop through all pages and rows in the table and update serial numbers
                 table.rows().every(function(index) {
-                    var row = this.node(); // Get the row element
-                    var serialNumber = index + 1; // Calculate the serial number (1-based index)
-                    $(row).find('td:first').text(
-                        serialNumber); // Update the serial number in the first column
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
                 });
             }
-
-            // Force DataTable to recalculate all serial numbers on redraw
-            function forceRedraw() {
-                var table = $('#tblUser').DataTable();
-
-                // Redraw the table
-                table.draw(false); // Keep the current page after redraw
-
-                // Update serial numbers across all pages
-                updateSerialNumbers(table);
-            }
-
-            // Optionally, you can call refreshTable() to redraw the entire table and ensure serial numbers are updated.
-            function refreshTable() {
-                var table = $('#tblUser').DataTable();
-                forceRedraw();
-            }
-
-
-
-
 
         });
     </script>

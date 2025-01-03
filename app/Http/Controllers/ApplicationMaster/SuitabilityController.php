@@ -76,13 +76,20 @@ class SuitabilityController extends Controller
                 'updated_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
+        $cropSuitability = DB::table('ag_crop_master_suitability')
+            ->where('id', $validated['id'])
+            ->first();
 
-        return redirect()->route('admin.appmaster.suitability')->with('success', 'Suitability updated successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Suitability updated successfully.',
+            'cropSuitability' => $cropSuitability
+        ]);
+        // return redirect()->route('admin.appmaster.suitability')->with('success', 'Suitability updated successfully.');
     }
     public function create(Request $request)
     {
         if ($request->isMethod('post')) {
-            // Validate the request
             $validated = $request->validate([
                 'soil' => 'required|string|max:255',
                 'soil_as' => 'nullable|string|max:255',
@@ -94,8 +101,6 @@ class SuitabilityController extends Controller
                 'crop_type_cd.required' => 'The crop type is required.',
                 'crop_name_cd.required' => 'The crop name is required.',
             ]);
-
-
 
             $maxId = DB::table('ag_crop_master_suitability')
                 ->max('id');
@@ -115,21 +120,22 @@ class SuitabilityController extends Controller
                 'created_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-            return redirect()->route('admin.appmaster.suitability')->with('success', 'Suitability created successfully.');
+            // return redirect()->route('admin.appmaster.suitability')->with('success', 'Suitability created successfully.');
+
+            return redirect()->back()->with('success', 'Suitability created successfully.');
         }
 
-        // Fetch crop types for the dropdown
         $cropTypes = DB::table('ag_crop_type_master')->pluck('crop_type_desc', 'crop_type_cd');
         $cropTypes = $cropTypes->map(function ($description) {
-            return strtoupper($description); // Convert each crop type description to uppercase
+            return strtoupper($description);
         });
 
-        // Sort the crop types alphabetically
         $cropTypes = $cropTypes->sort();
 
-        // Handle displaying the form
         return view('admin.appmaster.createsuitability', ['cropTypes' => $cropTypes]);
     }
+
+
     public function destroy(Request $request)
     {
         $validated = $request->validate([
@@ -140,6 +146,12 @@ class SuitabilityController extends Controller
             ->where('id', $validated['id'])
             ->delete();
 
-        return redirect()->route('admin.appmaster.suitability')->with('success', 'Suitability deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Suitability deleted successfully.',
+            'id' => $validated['id']
+        ]);
+
+        // return redirect()->route('admin.appmaster.suitability')->with('success', 'Suitability deleted successfully.');
     }
 }

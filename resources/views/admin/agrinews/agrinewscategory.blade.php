@@ -2,7 +2,7 @@
 
 @section('title', 'Agri News Category Manager')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -10,9 +10,9 @@
 <div class="card">
     <div class="d-flex align-items-center">
         <h5 class="card-header">Agri News Category Manager</h5>
-        
+
         <div class="col-md-3">
-            <button type="button" class="btn btn-outline-info openCreateModalBtn" data-bs-toggle="modal" 
+            <button type="button" class="btn btn-outline-info openCreateModalBtn" data-bs-toggle="modal"
             data-bs-target="#createCategoryModal">
               <i class="tf-icons bx bx-plus-medical"></i>
                 Create News Category
@@ -37,7 +37,7 @@
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
-            
+
               @forelse ($newsCategories as $index => $item)
               <tr>
                   <td>
@@ -45,7 +45,7 @@
                   </td>
                   <td>{{$item->catg_descr}}</td>
                   <td>
-                    <button class="btn btn-sm btn-outline-primary openEditModalBtn" 
+                    <button class="btn btn-sm btn-outline-primary openEditModalBtn"
                     data-id="{{Crypt::encrypt($item->catg_cd)}}"
                     data-category = "{{$item->catg_descr}}">
                     <i class='bx bx-edit'></i>Edit</button>
@@ -56,7 +56,7 @@
                       <td class="text-warning text-center" colspan="3">No data found</td>
                   </tr>
               @endforelse
-            
+
           </tbody>
         </table>
       </div>
@@ -123,7 +123,7 @@
       </div>
 
 
-</div> 
+</div>
 
 
 
@@ -133,13 +133,16 @@
 @section('custom_js')
 <script>
     $(document).ready( function () {
-        
 
+        const allElements = document.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.fontSize = '14px';
+                });
         // Open Create Modal
-        $('.openCreateModalBtn').on('click', function(){ 
+        $('.openCreateModalBtn').on('click', function(){
             $('#createCategoryModal').on('shown.bs.modal', function (e) {
             $('#createCategoryName').focus();
-            }).modal('show');  
+            }).modal('show');
         });
 
         // Open Edit Modal
@@ -183,7 +186,7 @@
         // Edit News Category AJAX
         $('#editNewsCategoryForm').on('submit', function(e){
             e.preventDefault();
-            
+
             $.ajax ({
                 url: '{{route('agrinews.categorymanager.edit')}}',
                 data: $('#editNewsCategoryForm').serialize(),

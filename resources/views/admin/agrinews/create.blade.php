@@ -2,7 +2,7 @@
 
 @section('title', 'AgriNewsManager')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -27,11 +27,11 @@
         </div>
         <div class="mb-3">
             <label class="form-label" for="category_cd">Select Category</label>
-            <select class="form-select  @error('category_cd') is-invalid @enderror" 
+            <select class="form-select  @error('category_cd') is-invalid @enderror"
             id="category_cd" name="category_cd" aria-label="Select News Category">
             <option selected disabled value="">Select News Category</option>
             @forelse ($newsCategories as $item)
-            <option value="{{$item->catg_cd}}">{{$item->catg_descr}}</option>   
+            <option value="{{$item->catg_cd}}">{{$item->catg_descr}}</option>
             @empty
                 <option disabled value="">No data found</option>
             @endforelse
@@ -46,7 +46,7 @@
 
         <div class="mb-3">
             <label class="form-label" for="phone">News in Details</label>
-            {{-- <input type="text" id="phone" name="phone" 
+            {{-- <input type="text" id="phone" name="phone"
             class="form-control phone-mask  @error('phone') is-invalid @enderror"> --}}
             <textarea name="newsDescription" id="newsDescription" class="form-control @error('newsDescription') is-invalid @enderror" rows="10"></textarea>
             @error('newsDescription')
@@ -80,7 +80,7 @@
 
         {{-- Email --}}
         <div class="mb-3">
-            <label class="form-label" for="email">News Creator 
+            <label class="form-label" for="email">News Creator
             <span class="badge bg-label-warning">Read Only</span></label>
             <div class="input-group input-group-merge">
             <input type="text" id="email" name="email" class="form-control @error('email') is-invalid @enderror"
@@ -105,6 +105,14 @@
 
 @section('custom_js')
 <script>
-  
+ $(document).ready( function () {
+
+const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.fontSize = '14px';
+        });
+
+    });
+
 </script>
 @endsection

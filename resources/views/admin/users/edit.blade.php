@@ -2,7 +2,7 @@
 
 @section('title', 'Edit user')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -27,14 +27,14 @@
         {{-- Office --}}
         <div class="mb-3">
           <label class="form-label" for="office_id">Office</label>
-          <select class="form-select  @error('office_id') is-invalid @enderror" 
+          <select class="form-select  @error('office_id') is-invalid @enderror"
           id="office_id" name="office_id" aria-label="Default select example">
             <option selected disabled value="">Select Office</option>
             @forelse ($offices as $item)
             @if ($user->office_id == $item->id)
-              <option value="{{$item->id}}" selected>{{$item->name}}, {{$item->address}}</option>   
-            @else 
-              <option value="{{$item->id}}">{{$item->name}}, {{$item->address}}</option>   
+              <option value="{{$item->id}}" selected>{{$item->name}}, {{$item->address}}</option>
+            @else
+              <option value="{{$item->id}}">{{$item->name}}, {{$item->address}}</option>
             @endif
             @empty
                 <option disabled value="">No data found</option>
@@ -55,11 +55,11 @@
             <option selected disabled value="">Select</option>
             @forelse ($departments as $item)
               @if ($user->department_id == $item->id)
-                  <option value="{{$item->id}}" selected>{{$item->department_name}}</option>   
+                  <option value="{{$item->id}}" selected>{{$item->department_name}}</option>
               @else
-                  <option value="{{$item->id}}">{{$item->department_name}}</option>       
+                  <option value="{{$item->id}}">{{$item->department_name}}</option>
               @endif
-            
+
             @empty
                 <option disabled value="">No data found</option>
             @endforelse
@@ -79,11 +79,11 @@
             <option selected disabled value="">Select</option>
             @forelse ($designations as $item)
               @if ($user->designation_id == $item->id)
-                <option value="{{$item->id}}" selected >{{$item->designation_name}}</option>       
+                <option value="{{$item->id}}" selected >{{$item->designation_name}}</option>
               @else
-                <option value="{{$item->id}}">{{$item->designation_name}}</option>     
-              @endif  
-              
+                <option value="{{$item->id}}">{{$item->designation_name}}</option>
+              @endif
+
             @empty
                 <option disabled value="">No data found</option>
             @endforelse
@@ -98,7 +98,7 @@
 
         {{-- Email --}}
         <div class="mb-3">
-          <label class="form-label" for="email">Email 
+          <label class="form-label" for="email">Email
             <span class="badge bg-label-warning">Read Only</span></label>
           <div class="input-group input-group-merge">
             <input type="text" id="email" name="email" class="form-control @error('email') is-invalid @enderror"
@@ -115,7 +115,7 @@
         {{-- Phone No --}}
         <div class="mb-3">
           <label class="form-label" for="phone">Phone No</label>
-          <input type="text" id="phone" name="phone" 
+          <input type="text" id="phone" name="phone"
           class="form-control phone-mask  @error('phone') is-invalid @enderror"
           value="{{ $user->phone }}">
 
@@ -134,5 +134,14 @@
   </div>
 @endsection
 
-@section('custom_js')    
+@section('custom_js')
+<script>
+    $(document).ready( function () {
+      const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
+      $('#tblUser').DataTable();
+    } );
+</script>
 @endsection

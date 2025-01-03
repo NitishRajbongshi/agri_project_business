@@ -2,7 +2,7 @@
 
 @section('title', '[Agri-Expert] Answer Queries')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -23,9 +23,9 @@
             <option  value="" >All Categories</option>
             @foreach ($categories as $category)
                   @if(isset($selectedId) && $selectedId == $category->catg_id)
-                    <option selected value="{{ Crypt::encrypt($category->catg_id) }}">{{ $category->catg_descr }}</option>  
+                    <option selected value="{{ Crypt::encrypt($category->catg_id) }}">{{ $category->catg_descr }}</option>
                   @else
-                    <option value="{{ Crypt::encrypt($category->catg_id) }}">{{ $category->catg_descr }}</option>  
+                    <option value="{{ Crypt::encrypt($category->catg_id) }}">{{ $category->catg_descr }}</option>
                   @endif
             @endforeach
           </select>
@@ -50,16 +50,16 @@
     <div class="card mb-4">
       <div class="card-body">
         <h5 class="card-title text-primary">[{{$index + 1}}]. AKC. NO: {{ $item->ack_no }}</h5>
-        <div class="card-subtitle text-muted mb-3">Submitted By {{$item->query_submitted_by}}, 
-          on {{ date('d-m-Y H:i:s', strtotime($item->query_submitted_on)) }}, 
+        <div class="card-subtitle text-muted mb-3">Submitted By {{$item->query_submitted_by}},
+          on {{ date('d-m-Y H:i:s', strtotime($item->query_submitted_on)) }},
           from {{$item->district}}</div>
         <p class="card-text text-wrap">
           {{$item->query_desc}}
         </p>
         <div class="float-end">
         {{-- <a href="javascript:void(0)" class="card-link btn btn-primary">Card link</a> --}}
-        
-        <button class="btn btn-sm btn-outline-primary OpenViewModalBtn" 
+
+        <button class="btn btn-sm btn-outline-primary OpenViewModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -69,11 +69,11 @@
                     data-district = "{{ $item->district }}"
                     data-toggle="tooltip" data-placement="top" title="Quick View">
                     <i class='bx bx-show'></i>Quick View</button>
-        
+
         {{-- <a href="javascript:void(0)" class="card-link btn btn-info">Another link</a> --}}
 
         @if($item->parent_ack_no == null)
-          <button class="btn btn-sm btn-outline-success OpenAnswerModalBtn" 
+          <button class="btn btn-sm btn-outline-success OpenAnswerModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -84,10 +84,10 @@
                     data-toggle="tooltip" data-placement="top" title="Write Answer">
                     <i class='bx bx-check-circle'></i>Write Answer</button>
         @else
-          <a href="{{route('agriexpert.loadthread', ['id' => Crypt::encrypt($item->parent_ack_no)])}}" 
+          <a href="{{route('agriexpert.loadthread', ['id' => Crypt::encrypt($item->parent_ack_no)])}}"
             class="btn btn-sm btn-outline-info">View Parent Thread</a>
         @endif
-        
+
           <a class="btn btn-sm btn-outline-secondary OpenAnswerThreadBtn"
                     {{-- data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-toggle="tooltip" data-placement="top" title="View Thread" --}}
@@ -97,15 +97,15 @@
       </div>
     </div>
 
-   
 
-    @empty 
+
+    @empty
       <div class="card">
         <div class="card-body">
           <div class="card-text">No queries found.</div>
         </div>
       </div>
-    @endforelse 
+    @endforelse
   </div>
 
   @if(strlen( $queries->links() )>0)
@@ -117,7 +117,7 @@
     </div>
   </div>
   @endif
-  
+
 
     {{-- View Question Modal --}}
     <div class="modal fade" id="viewQuestionModal" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -127,9 +127,9 @@
             <h5 class="modal-title" >View Question</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          
+
           <div class="modal-body">
-            
+
             <div class="table-responsive text-wrap">
               <table class="table table-hover">
                 <tbody class="table-border-bottom-0">
@@ -143,17 +143,17 @@
                   </tr>
                 </tbody>
               </table>
-            </div> 
+            </div>
 
-          </div> 
+          </div>
         </div>
         <div class="modal-footer">
-         
+
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
             Close
           </button>
         </div>
-       
+
       </div>
     </div>
   </div>
@@ -166,7 +166,7 @@
           <h5 class="modal-title" >Accept Question</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        
+
         <div class="modal-body">
 
           <div class="table-responsive text-wrap">
@@ -182,21 +182,21 @@
                 </tr>
               </tbody>
             </table>
-          </div> 
+          </div>
 
-          <form id="formAnswerQuery">    
-            @csrf                   
+          <form id="formAnswerQuery">
+            @csrf
                <input type="hidden" id="answer_query_id" name="answer_query_id"  value="">
-              
+
                <div class="row mt-2">
                 <label for="queryAnswer" class="col-sm-3 col-form-label"><strong> Write Answer: </strong></label>
                 <div class="col-sm-9">
                     <textarea rows="4" class="form-control" id="queryAnswer" name="queryAnswer" aria-label="Write an answer"></textarea>
                 </div>
                </div>
-        </div>   
+        </div>
         {{-- End of Modal Body --}}
-        
+
         <div class="modal-footer">
 
           <button type="submit" class="btn btn-success" id="answerQueryBtn" >
@@ -206,7 +206,7 @@
             Close
           </button>
         </div>
-      </form> 
+      </form>
 
       </div>
     </div>
@@ -214,9 +214,13 @@
 
 @endsection
 
-@section('custom_js')  
+@section('custom_js')
 <script>
     $(document).ready( function () {
+        const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
         $('#tblQueriesToAnswer').DataTable();
 
         // $("#tblQueriesToAnswer").on("click", ".OpenViewModalBtn", function(){
@@ -260,8 +264,8 @@
 
       // Answer Query AJAX
       $('#answerQueryBtn').click(function(e){
-        
-        e.preventDefault(); 
+
+        e.preventDefault();
         // data= $("#formAnswerQuery").serialize();
         // alert(data);
           $.ajax({
@@ -281,16 +285,16 @@
                 else if(data.status == 0) {
                   alert(data.message);
                 }
-              }, 
+              },
               error: function(){
                     alert("Query answering failed.Something went wrong!");
               }
-          }); 
+          });
         });
 
         $('#queryCategorySelect').change( function(){
           var category = $('#queryCategorySelect').val() ;
-          var path = window.location.origin + '/query-answer/agri-expert/queryviewer/'+category;          
+          var path = window.location.origin + '/query-answer/agri-expert/queryviewer/'+category;
           window.location.href = path;
         });
 
@@ -299,6 +303,6 @@
           $('[data-toggle="tooltip"]').tooltip()
         })
     } );
-</script> 
+</script>
 @endsection
 

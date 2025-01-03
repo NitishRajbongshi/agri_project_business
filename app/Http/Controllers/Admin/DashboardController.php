@@ -55,9 +55,8 @@ class DashboardController extends Controller
                 )
                 ->join('ag_crop_disease_master', 'ag_crop_disease_master.disease_cd', '=', 'ag_disease_diagnose_dtls.disease_cd')
                 ->orderBy('requested_on', 'desc')->first();
-
-                if($lastDiagnosedDisease)
-                {
+            try {
+                if ($lastDiagnosedDisease) {
                     $CityNameResponse = $lastDiagnosedDisease->locality_name;
                     $DistrictNameResponse = $lastDiagnosedDisease->district_name;
                     $lat = $lastDiagnosedDisease->lat;
@@ -65,8 +64,6 @@ class DashboardController extends Controller
                     $lastDiagnosedDiseaseName = $lastDiagnosedDisease->disease_name;
                     $lastdDiseaseDiagnosedOn = date("d-m-Y", strtotime($lastDiagnosedDisease->requested_on));
                 }
-           
-                
                 if (($CityNameResponse == "" || $CityNameResponse == null) && $lat != null) {
                     $distNLocalityNameResponse = Http::get('http://43.205.45.246:8082/getDistrict_and_lcality_name_from_MapBoxAPI?lat=' . $lastDiagnosedDisease->lat . '&lon=' . $lastDiagnosedDisease->lon);
                     $CityNameResponse = $distNLocalityNameResponse["locality_name"];
@@ -85,7 +82,12 @@ class DashboardController extends Controller
                 Log::info("last diagnosed disease location Name : " . $CityNameResponse);
                 Log::info("last diagnosed disease District  : " . $DistrictNameResponse);
 
-           
+            } catch (Exception $e) {
+                Log::error($e->getMessage());
+                Log::error($e->getCode());
+                $CityNameResponse = "Sonapur";
+                $DistrictNameResponse = "Kamrup Metro";
+            }
             // Log::info($districtWiseGeoJsonData);
 
             $districtWiseAllDiseaseJsonData = (file_get_contents(storage_path() . "/app/public/DataSetOfAllDiseasesDistrictWise.json"));
@@ -121,7 +123,7 @@ class DashboardController extends Controller
             $totalSchema = AgriNews::where('news_catg_cd', 'S')->count();
             $totalGeneral = AgriNews::where('news_catg_cd', 'G')->count();
             $piChartData = array($totalGeneral, $totalSchema, $totalFAQ);
-            Log::info($piChartData);
+            // Log::info($piChartData);
             // return response()->json($response);
             ////Get Data for pi Chart -- End
 

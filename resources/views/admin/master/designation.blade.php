@@ -2,7 +2,7 @@
 
 @section('title', 'Designation Master')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -34,12 +34,12 @@
                 </td>
                 <td>{{$item->designation_name}}</td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary OpenEditModalBtn" 
+                  <button class="btn btn-sm btn-outline-primary OpenEditModalBtn"
                   data-id="{{Crypt::encrypt($item->id)}}"
                   data-designation_name = "{{$item->designation_name}}">
                   <i class='bx bx-edit'></i>Edit</button>
 
-                  <button class="btn btn-sm btn-outline-danger deleteBtn" 
+                  <button class="btn btn-sm btn-outline-danger deleteBtn"
                   data-id="{{Crypt::encrypt($item->id)}}">
                   <i class='bx bx-trash'></i>Delete</button>
                 </td>
@@ -49,7 +49,7 @@
                     <td colspan="3">No data found</td>
                 </tr>
             @endforelse
-          
+
         </tbody>
       </table>
     </div>
@@ -116,7 +116,7 @@
       </div>
 @endsection
 
-@section('custom_js')   
+@section('custom_js')
 
 {{-- Create AJAX --}}
 <script>
@@ -190,7 +190,7 @@
             return 0;
         }
 
-        
+
 
     });
 </script>
@@ -248,6 +248,10 @@
 
 <script>
   $(document).ready( function () {
+    const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
     $('#tblDesignation').DataTable();
   } );
 </script>

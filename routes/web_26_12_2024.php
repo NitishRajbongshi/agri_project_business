@@ -114,11 +114,6 @@ Route::put('/cropvarietydetails/update', [CropDetailsVarietyController::class, '
 Route::delete('/cropvarietydetails/delete', [CropDetailsVarietyController::class, 'destroy'])->name('admin.cropvarietydetails.cropvarietydetails.destroy');
 // Route::post('admin/cropvarietydetails/createvariety', [CropDetailsVarietyController::class, 'create'])->name('admin.cropvarietydetails.createvariety');
 
-Route::middleware('auth')->get('cropmeds', [AgriMedicianlProductController::class, 'agriMedicinalProducts'])->name('admin.agriMedicinalProducts');
-Route::middleware('auth')->match(['get', 'post'], 'create-medicinal-products', [AgriMedicianlProductController::class, 'create'])->name('admin.agriMedicinalProducts.createmedicinalproducts');
-Route::delete('/cropmeds/delete', [AgriMedicianlProductController::class, 'destroy'])->name('admin.agriMedicinalProducts.agriMedicinalProducts.destroy');
-Route::put('/cropmeds/update', [AgriMedicianlProductController::class, 'update'])->name('admin.agriMedicinalProducts.update');
-
 Route::middleware('auth')->get('cropprotectiondetails', [CropDetailsProtectionController::class, 'cropprotectiondetails'])->name('admin.cropprotectiondetails');
 Route::get('/admin/crop-nam', [CropDetailsProtectionController::class, 'getCropNam']);
 Route::get('/admin/diseases', [CropDetailsProtectionController::class, 'getDiseases'])->name('admin.cropprotectiondetails.getDiseases');
@@ -145,6 +140,15 @@ Route::get('/image/{filename}', [ImageController::class, 'show'])->name('image.s
 Route::post('/admin/review-crop-image/correct', action: [ReviewCropImageController::class, 'saveCorrectImage'])->name('save.correct.image');
 
 Route::group(['prefix' => 'master', 'middleware' => 'auth'], function () {
+    Route::get('users', [UserController::class, 'users'])->name('admin.users');
+    Route::match(['get', 'post'], 'create-user', [UserController::class, 'create'])->name('admin.users.create');
+    Route::get('edit-user/{id}', [UserController::class, 'edit'])->name('admin.users.edit');
+    Route::post('edit-user/{id}', [UserController::class, 'edit_save'])->name('admin.users.edit_save');
+    Route::post('user/changestatus', [UserController::class, 'change_staus'])->name('admin.user.changestatus');
+
+    Route::get('rolemanager', [RoleController::class, 'rolemanager'])->name('admin.rolemanager');
+    Route::post('setrole', [RoleController::class, 'setRole'])->name('admin.role.set');
+
     //master/designation routes
     Route::get('designation', [DesignationController::class, 'index'])->name('admin.designation');
     Route::post('designation', [DesignationController::class, 'createDesignation'])->name('admin.designation_post');
@@ -166,7 +170,6 @@ Route::group(['prefix' => 'master', 'middleware' => 'auth'], function () {
     Route::get('office', [OfficeController::class, 'index'])->name('admin.office');
     Route::post('office', [OfficeController::class, 'createOffice'])->name('admin.office_post');
     Route::post('office/edit', [OfficeController::class, 'editOffice'])->name('admin.office.edit');
-    
     // admin/user order
     Route::get("order/reports", [ItemReportController::class, 'index'])->name('admin.user.order');
     Route::post("order/delivery/update", [ItemReportController::class, 'updateDeliveryStatus'])->name('admin.order.delivery.update');
@@ -176,9 +179,6 @@ Route::group(['prefix' => 'master', 'middleware' => 'auth'], function () {
     Route::get('freshlee/master/items', [ItemController::class, 'index'])->name('admin.freshlee.master.item');
     Route::get('freshlee/master/items/create', [ItemController::class, 'create'])->name('admin.freshlee.master.item.create');
     Route::post('freshlee/master/items/create', [ItemController::class, 'store']);
-    Route::put('freshlee/master/items/edit', [ItemController::class, 'update'])->name('admin.freshlee.master.item.update');
-    Route::delete('freshlee/master/items/delete', [ItemController::class, 'destroy'])->name('admin.freshlee.master.item.destroy');
-    Route::get('freshlee/master/items/image', [ItemController::class, 'getItemImage'])->name('admin.freshlee.master.item.image');
 });
 
 

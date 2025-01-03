@@ -2,7 +2,7 @@
 
 @section('title', 'Department Master')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -27,7 +27,7 @@
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
-          
+
             @forelse ($departments as $index => $item)
             <tr>
                 <td>
@@ -35,11 +35,11 @@
                 </td>
                 <td>{{$item->department_name}}</td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary OpenEditModalBtn" 
+                  <button class="btn btn-sm btn-outline-primary OpenEditModalBtn"
                   data-id="{{Crypt::encrypt($item->id)}}"
                   data-department_name = "{{$item->department_name}}">
                   <i class='bx bx-edit'></i>Edit</button>
-                  <button class="btn btn-sm btn-outline-danger deleteBtn" 
+                  <button class="btn btn-sm btn-outline-danger deleteBtn"
                   data-id="{{Crypt::encrypt($item->id)}}">
                   <i class='bx bx-trash'></i>Delete</button>
                 </td>
@@ -49,7 +49,7 @@
                     <td colspan="3">No data found</td>
                 </tr>
             @endforelse
-          
+
         </tbody>
       </table>
     </div>
@@ -116,7 +116,7 @@
       </div>
 @endsection
 
-@section('custom_js')   
+@section('custom_js')
 
 {{-- Create AJAX --}}
 <script>
@@ -243,6 +243,10 @@
 
 <script>
   $(document).ready( function () {
+    const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
     $('#tblDepartment').DataTable();
   } );
 </script>

@@ -6,13 +6,10 @@
 @endsection
 
 @section('main')
-
-    @if ($message = Session::get('success'))
-        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ $message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
+    <div id="successAlert" class="alert alert-success alert-dismissible fade d-none" role="alert">
+        <span class="alert-message"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <div class="card">
         <div class="d-flex align-items-center">
             <h5 class="card-header">Crop Information Management</h5>
@@ -37,7 +34,7 @@
                 </thead>
                 <tbody class="table-border-bottom-0">
                     @forelse ($data as $index => $item)
-                        <tr>
+                        <tr data-crop-name-cd={{ $item->crop_name_cd }} data-original-index="{{ $index + 1 }}">
                             <td>{{ $index + 1 }}</td>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->crop_name_desc }}</>
                             <td style="overflow-wrap: break-word; white-space: normal;">{{ $item->crop_name_desc_as }}</td>
@@ -140,127 +137,215 @@
                 </form>
             </div>
         </div>
-@endsection
-@section('custom_js')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var successAlert = document.getElementById('successAlert');
+    @endsection
+    @section('custom_js')
+        <script>
+            $(document).ready(function() {
+                const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
+                  
+                $('#tblUser').DataTable();
 
-            if (successAlert) {
-                setTimeout(function() {
-                    successAlert.style.opacity = '0';
-                    successAlert.style.transition = 'opacity 0.5s ease-out';
-                    setTimeout(function() {
-                        successAlert.remove();
-                    }, 500);
-                }, 5000);
-            }
-        });
+                $('#editModal').on('show.bs.modal', function(event) {
+                    var button = $(event.relatedTarget);
+                    var cropNameCd = button.data('id');
+                    var cropName = button.data('crop-name');
+                    var cropNameAs = button.data('crop-name-as');
+                    var registryNo = button.data('registry-no');
+                    var scientificName = button.data('scientific-name');
 
-        $(document).ready(function() {
-            $('#tblUser').DataTable();
+                    var modal = $(this);
+                    modal.find('#cropNameCd').val(cropNameCd);
+                    modal.find('#cropName').val(cropName);
+                    modal.find('#cropNameAs').val(cropNameAs);
+                    modal.find('#registryNo').val(registryNo);
+                    modal.find('#scientificName').val(scientificName);
+                });
 
-            $('#editModal').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var cropNameCd = button.data('id');
-                var cropName = button.data('crop-name');
-                var cropNameAs = button.data('crop-name-as');
-                var registryNo = button.data('registry-no');
-                var scientificName = button.data('scientific-name');
+                $('#editForm').on('submit', function(e) {
+                    e.preventDefault(); // Prevent form submission
 
-                var modal = $(this);
-                modal.find('#cropNameCd').val(cropNameCd);
-                modal.find('#cropName').val(cropName);
-                modal.find('#cropNameAs').val(cropNameAs);
-                modal.find('#registryNo').val(registryNo);
-                modal.find('#scientificName').val(scientificName);
-            });
+                    var isValid = true;
+                    var cropName = $('#cropName').val().trim();
+                    var registryNo = $('#registryNo').val().trim();
+                    var cropNameCd = $('#cropNameCd').val().trim();
+                    var form = $(this);
 
-            $('#editForm').on('submit', function(e) {
-                e.preventDefault(); // Prevent form submission
+                    // Clear previous error states
+                    $('#cropName').removeClass('is-invalid');
+                    $('#registryNo').removeClass('is-invalid');
+                    $('.invalid-feedback').hide();
 
-                var isValid = true;
-                var cropName = $('#cropName').val().trim();
-                var registryNo = $('#registryNo').val().trim();
-                var cropNameCd = $('#cropNameCd').val().trim();
-                var form = $(this);
+                    // Check Crop Name field
+                    if (cropName === '') {
+                        $('#cropName').addClass('is-invalid');
+                        $('.invalid-feedback').filter('.crop-name-feedback').show();
+                        isValid = false;
+                    }
 
-                // Clear previous error states
-                $('#cropName').removeClass('is-invalid');
-                $('#registryNo').removeClass('is-invalid');
-                $('.invalid-feedback').hide();
 
-                // Check Crop Name field
-                if (cropName === '') {
-                    $('#cropName').addClass('is-invalid');
-                    $('.invalid-feedback').filter('.crop-name-feedback').show();
-                    isValid = false;
-                }
+                    if (registryNo !== '') {
+                        $.ajax({
+                            url: '{{ route('admin.appmaster.crops.checkRegistryNo') }}',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                registry_no: registryNo,
+                                crop_name_cd: cropNameCd
+                            },
+                            success: function(response) {
+                                if (response.exists) {
+                                    $('#registryNo').addClass('is-invalid');
+                                    $('.invalid-feedback').filter('.registry-no-feedback').text(
+                                        'The Crop Registry No is already in use.').show();
+                                    isValid = false;
+                                } else {
+                                    $('#registryNo').removeClass('is-invalid');
+                                    $('.invalid-feedback').filter('.registry-no-feedback').hide();
+                                }
 
-                // Perform AJAX check for duplicate Crop Registry Number only if it's not empty
-                if (registryNo !== '') {
-                    $.ajax({
-                        url: '{{ route('admin.appmaster.crops.checkRegistryNo') }}',
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            registry_no: registryNo,
-                            crop_name_cd: cropNameCd
-                        },
-                        success: function(response) {
-                            if (response.exists) {
-                                $('#registryNo').addClass('is-invalid');
-                                $('.invalid-feedback').filter('.registry-no-feedback').text(
-                                    'The Crop Registry No is already in use.').show();
-                                isValid = false;
-                            } else {
-                                $('#registryNo').removeClass('is-invalid');
-                                $('.invalid-feedback').filter('.registry-no-feedback').hide();
+                                // if (isValid) {
+                                //     form.off('submit').submit();
+                                // }
+
+
+
+                                if (isValid) {
+                                    $.ajax({
+                                        url: form.attr('action'),
+                                        method: 'PUT',
+                                        data: form.serialize(),
+                                        dataType: 'json',
+                                        success: function(response) {
+                                            console.log(response.message);
+
+                                            if (response.success) {
+                                                $('#editModal').modal('hide');
+                                                $('#successAlert .alert-message').text(
+                                                    response.message);
+                                                $('#successAlert').removeClass('d-none')
+                                                    .addClass('show');
+
+                                                setTimeout(function() {
+                                                    $('#successAlert')
+                                                        .removeClass('show')
+                                                        .addClass('d-none');
+                                                }, 5000);
+
+                                                const targetRow = $(
+                                                    `#tblUser tbody tr[data-crop-name-cd="${response.updatedCropName.crop_name_cd}"]`
+                                                );
+
+                                                targetRow.find('td:nth-child(2)').text(response.updatedCropName.crop_name_desc);
+                                                targetRow.find('td:nth-child(3)').text(response.updatedCropName.crop_name_desc_as);
+                                                targetRow.find('td:nth-child(4)').text(response.updatedCropName.crop_registry_no);
+                                                targetRow.find('td:nth-child(5)').text(response.updatedCropName.scientific_name);
+
+                                                const editButton = targetRow.find('.edit-btn');
+                                                editButton.data('crop-name', response.updatedCropName.crop_name_desc);
+                                                editButton.data('crop-name-as', response.updatedCropName.crop_name_desc_as);
+                                                editButton.data('id', response.updatedCropName.crop_name_cd);
+                                                editButton.data('registry-no', response.updatedCropName.crop_registry_no);
+                                                editButton.data('scientific-name', response.updatedCropName.scientific_name);
+
+
+                                                targetRow.data('original-index',response.updatedCropName.crop_name_cd);
+                                                var table = $('#tblUser').DataTable();
+                                                table.draw(false);
+                                                updateSerialNumbers(table);
+                                            } else {
+                                                alert('Failed to update variety.');
+                                            }
+                                        },
+                                        error: function(xhr) {
+                                            console.error('Error updating variety:', xhr
+                                                .responseText);
+                                            alert(
+                                                'There was an error updating the variety.');
+                                        }
+                                    });
+                                }
+
+                            },
+                            error: function(xhr) {
+                                console.error('AJAX Error:', xhr); // Debugging output
                             }
+                        });
+                    } else {
+                        // If the registry number is empty, submit the form directly
+                        if (isValid) {
+                            form.off('submit').submit(); // Allow form submission
+                        }
+                    }
+                });
 
-                            // If validation is successful, submit the form
-                            if (isValid) {
-                                form.off('submit').submit(); // Allow form submission
+                function updateSerialNumbers(table) {
+                table.rows().every(function(index) {
+                    var row = this.node();
+                    var serialNumber = index + 1;
+                    $(row).find('td:first').text(serialNumber);
+                });
+            }
+
+                $('#deleteModal').on('show.bs.modal', function(event) {
+                    var button = $(event.relatedTarget);
+                    var crop_name_cd = button.data('crop_name_cd');
+
+                    var modal = $(this);
+                    modal.find('#deleteId').val(crop_name_cd);
+                });
+
+                $('#deleteForm').on('submit', function(e) {
+                    e.preventDefault();
+                    var form = $(this);
+
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: 'DELETE',
+                        data: form.serialize(),
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.success) {
+                                var rowToDelete = $('#tblUser tbody tr[data-crop-name-cd="' +
+                                    response.crop_name_cd + '"]');
+                                var table = $('#tblUser').DataTable();
+
+                                table.row(rowToDelete).remove().draw(false);
+                                table.draw(false);
+
+                                updateSerialNumbers(table);
+
+                                $('#successAlert .alert-message').text(response.message);
+                                $('#successAlert').removeClass('d-none').addClass('show');
+
+                                setTimeout(function() {
+                                    $('#successAlert').removeClass('show').addClass(
+                                        'd-none');
+                                }, 5000);
+
+                                $('#deleteModal').modal('hide');
+                            } else {
+                                console.error('Failed to delete variety:', response.message);
+                                alert('Failed to delete the variety.');
                             }
                         },
                         error: function(xhr) {
-                            console.error('AJAX Error:', xhr); // Debugging output
+                            console.error('Error deleting variety:', xhr.responseText);
+                            alert('There was an error deleting the variety.');
                         }
                     });
-                } else {
-                    // If the registry number is empty, submit the form directly
-                    if (isValid) {
-                        form.off('submit').submit(); // Allow form submission
-                    }
+                });
+
+
+                function updateSerialNumbers(table) {
+                    table.rows().every(function(index) {
+                        var row = this.node();
+                        var serialNumber = index + 1;
+                        $(row).find('td:first').text(serialNumber);
+                    });
                 }
             });
-
-            $('#deleteModal').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var crop_name_cd = button.data('crop_name_cd');
-
-                var modal = $(this);
-                modal.find('#deleteId').val(crop_name_cd);
-            });
-
-            // Handle form submission for deletion
-            $('#deleteForm').on('submit', function(e) {
-                e.preventDefault();
-
-                var form = $(this);
-
-                $.ajax({
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                    },
-                    success: function(response) {
-                        form.off('submit').submit();
-                    },
-                    error: function(xhr) {
-                        console.error('AJAX Error:', xhr);
-                    }
-                });
-            });
-        });
-    </script>
-@endsection
+        </script>
+    @endsection

@@ -2,7 +2,7 @@
 
 @section('title', 'Office Master')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -40,12 +40,12 @@
                 <td>{{$item->state}}</td>
                 <td>{{$item->contact}}</td>
                 <td>
-                  <button class="btn btn-sm btn-outline-primary OpenEditModalBtn" 
+                  <button class="btn btn-sm btn-outline-primary OpenEditModalBtn"
                   data-id="{{Crypt::encrypt($item->id)}}"
                   data-name = "{{$item->name}}"
                   data-district = "{{$item->district}}"
                   data-state = "{{$item->state}}"
-                  data-contact = "{{$item->contact}}" 
+                  data-contact = "{{$item->contact}}"
                   data-address = "{{$item->address}}" >
 
                   <i class='bx bx-edit'></i>Edit</button>
@@ -57,7 +57,7 @@
                     <td colspan="3">No data found</td>
                 </tr>
             @endforelse
-          
+
         </tbody>
       </table>
     </div>
@@ -80,16 +80,16 @@
                     <div class="col mb-3">
                     <label for="state" class="form-label">Select State</label>
 
-                    <select class="form-select" 
+                    <select class="form-select"
                     id="state" name="state" aria-label="Select Office State">
                         <option selected disabled value="">Select Office State</option>
                         @forelse ($states as $item)
-                        <option value="{{$item->state_name}}">{{$item->state_name}}</option>   
+                        <option value="{{$item->state_name}}">{{$item->state_name}}</option>
                         @empty
                             <option disabled value="">No data found</option>
                         @endforelse
                     </select>
-    
+
                     </div>
                 </div>
 
@@ -99,16 +99,16 @@
                     <div class="col mb-3">
                     <label for="district" class="form-label">Select District</label>
 
-                    <select class="form-select" 
+                    <select class="form-select"
                     id="district" name="district" aria-label="Select Office district">
                         <option selected disabled value="">Select Office District</option>
                         @forelse ($districts as $item)
-                        <option value="{{$item->district_name}}">{{$item->district_name}}</option>   
+                        <option value="{{$item->district_name}}">{{$item->district_name}}</option>
                         @empty
                             <option disabled value="">No data found</option>
                         @endforelse
                     </select>
-    
+
                     </div>
                 </div>
 
@@ -170,16 +170,16 @@
                     <div class="col mb-3">
                     <label for="editState" class="form-label">Select editS</label>
 
-                    <select class="form-select" 
+                    <select class="form-select"
                     id="editState" name="editState" aria-label="Select Office State">
                         <option selected disabled value="">Select Office State</option>
                         @forelse ($states as $item)
-                        <option value="{{$item->state_name}}">{{$item->state_name}}</option>   
+                        <option value="{{$item->state_name}}">{{$item->state_name}}</option>
                         @empty
                             <option disabled value="">No data found</option>
                         @endforelse
                     </select>
-    
+
                     </div>
                 </div>
 
@@ -189,16 +189,16 @@
                     <div class="col mb-3">
                     <label for="editDistrict" class="form-label">Select District</label>
 
-                    <select class="form-select" 
+                    <select class="form-select"
                     id="editDistrict" name="editDistrict" aria-label="Select Office District">
                         <option selected disabled value="">Select Office District</option>
                         @forelse ($districts as $item)
-                        <option value="{{$item->district_name}}">{{$item->district_name}}</option>   
+                        <option value="{{$item->district_name}}">{{$item->district_name}}</option>
                         @empty
                             <option disabled value="">No data found</option>
                         @endforelse
                     </select>
-    
+
                     </div>
                 </div>
 
@@ -244,7 +244,10 @@
 @section('custom_js')
 <script>
     $(document).ready( function () {
-
+        const allElements = document.querySelectorAll('*');
+                  allElements.forEach(el => {
+                      el.style.fontSize = '14px';
+                  });
       // Add New Office AJAX
       $('#createOfficeForm').on('submit', function(e) {
         const btn = $('#createOfficeBtn');
@@ -280,7 +283,7 @@
     // Edit Office Details Modal
     $("#tblOffice").on("click", ".OpenEditModalBtn", function(){
       const id = $(this).data('id');
-      
+
       $('#editId').val( id );
       $('#editState').val($(this).data('state'));
       $('#editDistrict').val($(this).data('district'));
@@ -326,7 +329,7 @@
 
       $('#tblOffice').DataTable();
 
-      
+
     } );
 </script>
 @endsection

@@ -86,7 +86,7 @@ class CropDetailsVarietyController extends Controller
                 'updated_at' => now()->setTimezone('Asia/Kolkata'),
             ]);
 
-        // Fetch updated data for the variety and return it in JSON format
+
         $updatedVariety = DB::table('ag_crop_variety_master')
             ->where('crop_variety_cd', $validated['crop_variety_cd'])
             ->first();
@@ -110,7 +110,7 @@ class CropDetailsVarietyController extends Controller
             ->where('crop_variety_cd', $validated['crop_variety_cd'])
             ->delete();
 
-        // Return a JSON response to be handled by AJAX
+
         return response()->json([
             'success' => true,
             'message' => 'Variety deleted successfully.',
@@ -137,8 +137,6 @@ class CropDetailsVarietyController extends Controller
                 'crop_variety_desc' => ['Crop variety description is required'],
                 'crop_variety_dtls' => ['Crop variety details are required'],
             ]);
-
-
 
 
             $maxcropvarid = DB::table('ag_crop_variety_master')
@@ -175,7 +173,5 @@ class CropDetailsVarietyController extends Controller
         return view('admin.cropvarietydetails.createvariety', ['cropTypes' => $cropTypes]);
 
     }
-
-
 
 }

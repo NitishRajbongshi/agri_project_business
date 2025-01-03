@@ -133,6 +133,14 @@
 @section('custom_js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+        const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        el.style.fontSize = '14px';
+                    });
+        $('#tblDesignation').DataTable();
+
+
             var successAlert = document.getElementById('successAlert');
 
             if (successAlert) {

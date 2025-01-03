@@ -21,7 +21,7 @@
                         <form class="frmGenerateReport" id="frmGenerateReport" method="POST"
                             action="{{ route('getMISReport') }}">
                             @csrf
-                            
+
                             @php
 
                             @endphp
@@ -134,6 +134,10 @@
 @section('custom_js')
     <script>
         $(document).ready(function() {
+            const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.fontSize = '14px';
+        });
             $('#tblNews').DataTable({
                 "buttons": [{
                         extend: 'copy',

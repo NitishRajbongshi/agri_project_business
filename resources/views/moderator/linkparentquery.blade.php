@@ -2,7 +2,7 @@
 
 @section('title', 'Moderate Queries')
 
-@section('custom_header')    
+@section('custom_header')
 @endsection
 
 @section('main')
@@ -22,8 +22,8 @@
 <div class="card mb-4">
     <div class="card-body">
         <h5 class="card-title text-primary">AKC. NO: {{ $selectedQuery->ack_no }}</h5>
-        <div class="card-subtitle text-muted mb-3">Submitted By {{$selectedQuery->query_submitted_by}}, 
-        on {{ date('d-m-Y H:i:s', strtotime($selectedQuery->query_submitted_on)) }}, 
+        <div class="card-subtitle text-muted mb-3">Submitted By {{$selectedQuery->query_submitted_by}},
+        on {{ date('d-m-Y H:i:s', strtotime($selectedQuery->query_submitted_on)) }},
         from {{$selectedQuery->district}}</div>
         <p class="card-text text-wrap">
         {{$selectedQuery->query_desc}}
@@ -31,7 +31,7 @@
     </div>
 </div>
 
-@else 
+@else
 <div class="card">
     <div class="card-body">
     <div class="card-text">No query found.</div>
@@ -71,7 +71,7 @@
                     @endif
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn" 
+                    <button class="btn btn-sm btn-outline-primary OpenViewModalBtn"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-query_submitted_by = "{{ $item->query_submitted_by }}"
                     data-query_submitted_on = "{{ $item->query_submitted_on }}"
@@ -83,19 +83,19 @@
                     <i class='bx bx-show'></i></button>
 
                     <button class="btn btn-sm btn-outline-success setAsParentQueryBtn"
-                    id="setAsParentQueryBtn" 
+                    id="setAsParentQueryBtn"
                     data-child_id ="{{ Crypt::encrypt($selectedQuery->query_id) }}"
                     data-query_id="{{ Crypt::encrypt($item->query_id) }}"
                     data-toggle="tooltip" data-placement="top" title="Set As Parent Query">
                     <i class='bx bx-check-circle'></i></button>
                 </td>
                 </tr>
-            @empty 
+            @empty
                 <tr>
                     <td colspan="3">No data found</td>
                 </tr>
-            @endforelse 
-            
+            @endforelse
+
         </tbody>
         </table>
     </div>
@@ -109,7 +109,7 @@
           <h5 class="modal-title" >View Question</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        
+
         <div class="modal-body">
 
           <div class="table-responsive text-wrap">
@@ -126,15 +126,15 @@
               </tbody>
             </table>
 
-          </div> 
+          </div>
         </div>
         <div class="modal-footer">
-         
+
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
             Close
           </button>
         </div>
-       
+
       </div>
     </div>
 </div>
@@ -145,6 +145,10 @@
 @section('custom_js')
 <script>
 $(document).ready( function () {
+    const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.fontSize = '14px';
+        });
     $('#tblQueries').DataTable();
 
     $("#tblQueries").on("click", ".OpenViewModalBtn", function(){
@@ -188,7 +192,7 @@ $(document).ready( function () {
                 //   alert(data.message);
                 //   console.log(data);
                 // }
-                // else 
+                // else
                 // {
                 //   console.log(data);
                 // }
