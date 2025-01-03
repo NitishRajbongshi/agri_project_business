@@ -84,6 +84,7 @@ class ItemController extends Controller
             'unit_min_order_qty' => 'required',
             'item_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+        DB::beginTransaction();
         try {
             $item = DB::table('smartag_market.tbl_item_master')
                 ->where('item_name', $request->item_name)
@@ -99,34 +100,56 @@ class ItemController extends Controller
             $nextId = $maxId ? $maxId + 1 : 1;
 
             // code to store item image
-            $folderName = strtoupper($request->item_name) . '_' . $nextId;
-            $folderPath = $folderName;
-            // Create folder if it doesn't exist
-            if (!Storage::disk('freshleeItems')->exists($folderPath)) {
-                Storage::disk('freshleeItems')->makeDirectory($folderPath);
+            if ($request->hasFile('item_image')) {
+                try {
+                    $rootPath = config('filesystems.disks.freshleeItems.root');
+                    if (!Storage::disk('freshleeItems')->exists($rootPath)) {
+                        Storage::disk('freshleeItems')->makeDirectory($rootPath);
+                    }
+                    $image = $request->file('item_image');
+                    $imageName = $image->getClientOriginalName();
+                    $image->storeAs('', $imageName, 'freshleeItems');
+                    $imagePath = $rootPath . '/' . $imageName;
+                    try {
+                        $insertStatus = DB::table('smartag_market.tbl_item_master')->insert([
+                            'item_cd' => $nextId,
+                            'item_name' => $request->item_name,
+                            'item_image_file_path' => $imagePath,
+                            'file_type' => $image->extension(),
+                            'perishability_cd' => $request->perishability_cd,
+                            'item_category_cd' => $request->item_category_cd,
+                            'product_type_cd' => $request->product_type_cd,
+                            'farm_life_in_days' => $request->farm_life_in_days,
+                            'min_qty_to_order' => $request->min_qty_to_order,
+                            'unit_min_order_qty' => $request->unit_min_order_qty,
+                        ]);
+                        if ($insertStatus) {
+                            DB::commit();
+                            return redirect()->route('admin.freshlee.master.item')
+                                ->with('success', 'Item created successfully.');
+                        } else {
+                            DB::rollBack();
+                            return redirect()->route('admin.freshlee.master.item.create')
+                                ->with('error', 'Failed to add item!');
+                        }
+                    } catch (\Exception $e) {
+                        Storage::disk('freshleeItems')->delete($imageName);
+                        DB::rollBack();
+                        return redirect()->route('admin.freshlee.master.item.create')
+                            ->with('error', 'Internal Server Error!');
+                    }
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    return redirect()->route('admin.freshlee.master.item.create')
+                        ->with('error', 'Failed to store image!');
+                }
+            } else {
+                DB::rollBack();
+                return redirect()->route('admin.freshlee.master.item.create')
+                    ->with('error', 'Image not found!');
             }
-            // Get the uploaded files
-            $image1 = $request->file('item_image');
-            $imageName1 = $folderName . '_' . substr(uniqid(), -7) . '.' . $image1->getClientOriginalExtension();
-            $image1->storeAs($folderPath, $imageName1, 'freshleeItems');
-            $rootPath = config('filesystems.disks.freshleeItems.root');
-
-            DB::table('smartag_market.tbl_item_master')->insert([
-                'item_cd' => $nextId,
-                'item_name' => $request->item_name,
-                'item_image_file_path' => $rootPath . '/' . $folderPath . '/' . $imageName1,
-                'file_type' => $request->item_image->extension(),
-                'perishability_cd' => $request->perishability_cd,
-                'item_category_cd' => $request->item_category_cd,
-                'product_type_cd' => $request->product_type_cd,
-                'farm_life_in_days' => $request->farm_life_in_days,
-                'min_qty_to_order' => $request->min_qty_to_order,
-                'unit_min_order_qty' => $request->unit_min_order_qty,
-            ]);
-
-            return redirect()->route('admin.freshlee.master.item')
-                ->with('success', 'Item created successfully.');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error($e->getMessage(), [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
@@ -137,6 +160,7 @@ class ItemController extends Controller
 
     public function update(Request $request)
     {
+        DB::beginTransaction();
         try {
             $item = DB::table('smartag_market.tbl_item_master')
                 ->where('item_cd', $request->item_cd)
@@ -153,9 +177,8 @@ class ItemController extends Controller
                 return redirect()->back()
                     ->with('error', 'Item name already exist.');
             }
-            if ($request->item_image == null) {
-                Log::info('No image');
-                $status = DB::table('smartag_market.tbl_item_master')
+            if ($request->item_image == null) { // update without image
+                $updateStatus = DB::table('smartag_market.tbl_item_master')
                     ->where('item_cd', $request->item_cd)
                     ->update([
                         'item_name' => $request->item_name,
@@ -166,37 +189,61 @@ class ItemController extends Controller
                         'min_qty_to_order' => $request->min_order,
                         'unit_min_order_qty' => $request->item_unit,
                     ]);
+                if ($updateStatus) {
+                    DB::commit();
+                    return redirect()->back()
+                        ->with('success', 'Item updated successfully.');
+                } else {
+                    DB::rollBack();
+                    return redirect()->back()
+                        ->with('error', 'Failed to update item!');
+                }
+            }
+            try { // update with image
+                $rootPath = config('filesystems.disks.freshleeItems.root');
+                if (!Storage::disk('freshleeItems')->exists($rootPath)) {
+                    Storage::disk('freshleeItems')->makeDirectory($rootPath);
+                }
+                $image = $request->file('item_image');
+                $imageName = $image->getClientOriginalName();
+                $image->storeAs('', $imageName, 'freshleeItems');
+                $imagePath = $rootPath . '/' . $imageName;
+                try {
+                    $updateStatus = DB::table('smartag_market.tbl_item_master')
+                        ->where('item_cd', $request->item_cd)
+                        ->update([
+                            'item_name' => $request->item_name,
+                            'item_image_file_path' => $imagePath,
+                            'file_type' => $image->extension(),
+                            'perishability_cd' => $request->perishability_cd,
+                            'item_category_cd' => $request->item_category_cd,
+                            'product_type_cd' => $request->product_type_cd,
+                            'farm_life_in_days' => $request->farm_life,
+                            'min_qty_to_order' => $request->min_order,
+                            'unit_min_order_qty' => $request->item_unit,
+                        ]);
+                    if ($updateStatus) {
+                        DB::commit();
+                        return redirect()->back()
+                            ->with('success', 'Item updated successfully.');
+                    } else {
+                        DB::rollBack();
+                        return redirect()->back()
+                            ->with('error', 'Failed to update item!');
+                    }
+                } catch (\Exception $e) {
+                    Storage::disk('freshleeItems')->delete($imageName);
+                    DB::rollBack();
+                    return redirect()->back()
+                        ->with('error', 'Internal Server Error!');
+                }
+            } catch (\Exception $e) {
+                DB::rollBack();
                 return redirect()->back()
-                    ->with('success', 'Item updated successfully.');
+                    ->with('error', 'Failed to store image!');
             }
-            // code to store item image
-            $folderName = strtoupper($request->item_name) . '_' . $request->item_cd;
-            $folderPath = $folderName;
-            // Create folder if it doesn't exist
-            if (!Storage::disk('freshleeItems')->exists($folderPath)) {
-                Storage::disk('freshleeItems')->makeDirectory($folderPath);
-            }
-            // Get the uploaded files
-            $image1 = $request->file('item_image');
-            $imageName1 = $folderName . '_' . substr(uniqid(), -7) . '.' . $image1->getClientOriginalExtension();
-            $image1->storeAs($folderPath, $imageName1, 'freshleeItems');
-            $rootPath = config('filesystems.disks.freshleeItems.root');
-            $status = DB::table('smartag_market.tbl_item_master')
-                ->where('item_cd', $request->item_cd)
-                ->update([
-                    'item_name' => $request->item_name,
-                    'item_image_file_path' => $rootPath . '/' . $folderPath . '/' . $imageName1,
-                    'file_type' => $request->item_image->extension(),
-                    'perishability_cd' => $request->perishability_cd,
-                    'item_category_cd' => $request->item_category_cd,
-                    'product_type_cd' => $request->product_type_cd,
-                    'farm_life_in_days' => $request->farm_life,
-                    'min_qty_to_order' => $request->min_order,
-                    'unit_min_order_qty' => $request->item_unit,
-                ]);
-            return redirect()->back()
-                ->with('success', 'Item updated successfully.');
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error($e->getMessage(), [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
