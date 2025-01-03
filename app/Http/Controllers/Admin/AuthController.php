@@ -43,8 +43,6 @@ class AuthController extends Controller
     public function login()
     {
         if (Auth::check()) {
-            // 
-            // return view('admin.dashboard');
             return back();
         }
         return view('admin.auth.login');
@@ -53,8 +51,6 @@ class AuthController extends Controller
 
     public function loginUser(Request $request)
     {
-        // // Login logic
-
         $request->validate([
             'email' => ['required', 'email'],
             'password' => 'required'
@@ -62,12 +58,9 @@ class AuthController extends Controller
 
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password, 'status' => 1])) {
             $request->session()->regenerate();
-
-            // if(auth()->user()->role_id == 1){
-
-            // }
             $main_role = $this->getUserRole(auth()->user()->user_id);
-            // dd($main_role);
+            $userName = auth()->user()->name;
+            $request->session()->put('name', $userName);
             $request->session()->put('current_role', $main_role);
 
             if ($main_role == 'ADMIN')

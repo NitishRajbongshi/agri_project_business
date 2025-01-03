@@ -49,7 +49,7 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <span class="fw-semibold d-block">{{ auth()->user()->name }}</span>
+                                    <span class="fw-semibold d-block">{{ Session::get('name') }}</span>
                                     <small class="text-muted">{{ Session::get('current_role') }}</small>
                                 </div>
                             </div>
