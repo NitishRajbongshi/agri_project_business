@@ -28,6 +28,7 @@ use App\Http\Controllers\ApplicationMaster\CropInformationController;
 use App\Http\Controllers\ApplicationMaster\SuitabilityController;
 use App\Http\Controllers\ApplicationMaster\SymptomController;
 use App\Http\Controllers\ApplicationMaster\RecommendationController;
+use App\Http\Controllers\FarmerInventory\FarmerStockController;
 use App\Http\Controllers\FreshleeMarket\ItemReportController;
 use App\Http\Controllers\FreshleeMaster\ItemController;
 use App\Http\Controllers\ImageController;
@@ -171,6 +172,11 @@ Route::group(['prefix' => 'master', 'middleware' => 'auth'], function () {
     Route::get("order/reports", [ItemReportController::class, 'index'])->name('admin.user.order');
     Route::post("order/delivery/update", [ItemReportController::class, 'updateDeliveryStatus'])->name('admin.order.delivery.update');
     Route::post("order/history", [ItemReportController::class, 'history'])->name('admin.order.history');
+
+    // handle farmer's avaiable
+    Route::get('farmer/stock', [FarmerStockController::class, 'index'])->name('farmer.stock');
+    Route::get('farmer/stock', [FarmerStockController::class, 'create'])->name("farmer.stock.create");
+    Route::post('farmer/stock', [FarmerStockController::class, 'store']);
 
     // admin/freshlee-master
     Route::get('freshlee/master/items', [ItemController::class, 'index'])->name('admin.freshlee.master.item');

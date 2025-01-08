@@ -68,14 +68,16 @@
             </ul>
         </li>
 
-
-        <li class="menu-item {{ Request::routeIs('admin.appmaster.*')
-    || Request::routeIs('admin.allcropdetails')
-    || Request::routeIs('admin.cropprotectiondetails')
-    || Request::routeIs('admin.cropsymptomdetails')
-    || Request::routeIs('admin.cropvarietydetails')
-    || Request::routeIs('admin.agriMedicinalProducts')
-    ? 'active' : '' }}">
+        {{-- Application Master Section --}}
+        <li
+            class="menu-item {{ Request::routeIs('admin.appmaster.*') ||
+            Request::routeIs('admin.allcropdetails') ||
+            Request::routeIs('admin.cropprotectiondetails') ||
+            Request::routeIs('admin.cropsymptomdetails') ||
+            Request::routeIs('admin.cropvarietydetails') ||
+            Request::routeIs('admin.agriMedicinalProducts')
+                ? 'active'
+                : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-layer"></i>
                 <div data-i18n="Application-Master" style="font-size: 0.8rem;">Application Master</div>
@@ -151,14 +153,15 @@
                 <i class="menu-icon tf-icons bx bx-layer"></i>
                 <div data-i18n="Application-Master" style="font-size: 0.8rem;">Freshlee Market</div>
             </a>
-
             <ul class="menu-sub">
-                <a href="{{ route('admin.user.order') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-layer"></i>
-                    <div data-i18n="Application-Master" style="font-size: 0.8rem;">User Order Details</div>
-                </a>
+                <li class="menu-item {{ Request::routeIs('admin.user.order') ? 'active' : '' }}">
+                    <a href="{{ route('admin.user.order') }}" class="menu-link">
+                        <div data-i18n="Application-Master" style="font-size: 0.8rem;">User Order Details</div>
+                    </a>
+                </li>
             </ul>
         </li>
+
         {{-- Freshlee Master --}}
         <li class="menu-item {{ Request::routeIs('admin.freshlee.master.item') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -167,12 +170,29 @@
             </a>
 
             <ul class="menu-sub">
-                <a href="{{ route('admin.freshlee.master.item') }}" class="menu-link">
-                    <i class="menu-icon tf-icons bx bx-layer"></i>
-                    <div data-i18n="Application-Master" style="font-size: 0.8rem;">Item Details</div>
-                </a>
+                <li class="menu-item {{ Request::routeIs('admin.freshlee.master.item') ? 'active' : '' }}">
+                    <a href="{{ route('admin.freshlee.master.item') }}" class="menu-link">
+                        <div data-i18n="Application-Master" style="font-size: 0.8rem;">Item Details</div>
+                    </a>
+                </li>
             </ul>
         </li>
+
+        {{-- Farmers Inventory --}}
+        <li class="menu-item {{ Request::routeIs('farmer.stock') ? 'open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-layer"></i>
+                <div data-i18n="Application-Master" style="font-size: 0.8rem;">Farmer's Inventory</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ Request::routeIs('farmer.stock') ? 'active' : '' }}">
+                    <a href="{{ route('farmer.stock') }}" class="menu-link">
+                        <div data-i18n="Application-Master" style="font-size: 0.8rem;">Farmer's Stock</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- Verify Diagnosis -->
         <li class="menu-item {{ Request::routeIs('admin.reviewcropimage') ? 'active' : '' }}">
             <a href="{{ route('admin.reviewcropimage') }}" class="menu-link">
