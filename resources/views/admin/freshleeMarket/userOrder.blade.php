@@ -98,15 +98,17 @@
                                     @foreach ($ordered_items as $ordered_item)
                                         <li>{{ $ordered_item['item_name'] }}:
                                             <span style="font-weight: bold;">{{ $ordered_item['item_quantity'] }}</span>
-                                            {{ $ordered_item['item_unit'] }}
+                                            {{ $ordered_item['qty_unit'] }}
                                         </li>
                                     @endforeach
                                 </ol>
                             </td>
                             <td style="overflow-wrap: break-word; white-space: normal;">
-                                {{ $item->is_delivered == 'Y' ? 'Delivered' : 'Pending' }}</td>
+                                {{ $item->is_delivered == 'Y' ? 'Delivered' : 'Pending' }}
+                            </td>
                             <td style="display: none; overflow-wrap: break-word; white-space: normal;">
-                                {{ $item->booking_ref_no }}</td>
+                                {{ $item->booking_ref_no }}
+                            </td>
                             <td>
                                 <a href="#" class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal"
                                     data-bs-target="#editModal" data-booking-id="{{ $item->booking_ref_no }}"
@@ -150,7 +152,8 @@
                             <td>{{ $serialNumber++ }}</td>
                             <td class="text-start">{{ $item->item_name }}</td>
                             <td>{{ $item->total_quantity }}</td>
-                            <td>{{ $item->unit_min_order_qty }}</td>
+                            <td>{{ $item->item_price_in }}</td>
+
                         </tr>
                     @endforeach
                 </tbody>

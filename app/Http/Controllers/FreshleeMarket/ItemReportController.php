@@ -114,7 +114,8 @@ class ItemReportController extends Controller
                     'item_cd', smartag_market.tbl_customer_booking_details.item_cd,
                     'item_name', smartag_market.tbl_item_master.item_name,
                     'item_unit', smartag_market.tbl_item_master.unit_min_order_qty,
-                    'item_quantity', smartag_market.tbl_customer_booking_details.item_quantity
+                    'item_quantity', smartag_market.tbl_customer_booking_details.item_quantity,
+                    'qty_unit', smartag_market.tbl_customer_booking_details.qty_unit
                 )
             ) AS order_items")
                 )
@@ -136,8 +137,19 @@ class ItemReportController extends Controller
                 ->select(
                     'smartag_market.tbl_customer_booking_details.item_cd',
                     'smartag_market.tbl_item_master.item_name',
-                    'smartag_market.tbl_item_master.unit_min_order_qty',
-                    DB::raw('SUM(smartag_market.tbl_customer_booking_details.item_quantity) AS total_quantity')
+                    'smartag_market.tbl_item_master.item_price_in',
+                    // DB::raw('SUM(smartag_market.tbl_customer_booking_details.item_quantity) AS total_quantity')
+                    DB::raw("
+                                SUM(
+                                        CASE 
+                                            WHEN 
+                                                smartag_market.tbl_customer_booking_details.qty_unit = 'gm' then 
+                                                    item_quantity/1000 
+                                            ELSE 
+                                                    item_quantity 
+                                        END
+                                    ) AS total_quantity
+                            ")
                 )
                 ->leftJoin(
                     'smartag_market.tbl_item_master',
@@ -148,7 +160,7 @@ class ItemReportController extends Controller
                 ->groupBy(
                     'smartag_market.tbl_customer_booking_details.item_cd',
                     'smartag_market.tbl_item_master.item_name',
-                    'smartag_market.tbl_item_master.unit_min_order_qty'
+                    'smartag_market.tbl_item_master.item_price_in'
                 )
                 ->whereBetween(DB::raw('DATE(smartag_market.tbl_customer_booking_details.order_date)'), [$start, $today])
                 ->get();
