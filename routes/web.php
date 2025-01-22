@@ -172,6 +172,8 @@ Route::group(['prefix' => 'master', 'middleware' => 'auth'], function () {
     Route::get("order/reports", [ItemReportController::class, 'index'])->name('admin.user.order');
     Route::post("order/delivery/update", [ItemReportController::class, 'updateDeliveryStatus'])->name('admin.order.delivery.update');
     Route::post("order/history", [ItemReportController::class, 'history'])->name('admin.order.history');
+    Route::post('order/billing', [ItemReportController::class, 'billing'])->name('order.billing');
+    Route::post('order/delivered', [ItemReportController::class, 'markAsDelivered'])->name('order.delivered');
 
     // handle farmer's avaiable
     Route::get('farmer/stock', [FarmerStockController::class, 'index'])->name('farmer.stock');

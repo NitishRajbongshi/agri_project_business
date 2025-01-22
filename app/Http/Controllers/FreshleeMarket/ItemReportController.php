@@ -274,4 +274,66 @@ class ItemReportController extends Controller
             return view('errors.generic');
         }
     }
+
+    public function billing(Request $request)
+    {
+        try {
+            $cust_id = $request->cust_id;
+            $cust_name = $request->cust_name;
+            $cust_phone = $request->cust_phone;
+            $booking_id = $request->booking_id;
+            $ordered_items = json_decode($request->order_items, true);
+            $priceList = [];
+            foreach ($ordered_items as $item) {
+                // Fetch item price from the database
+                $itemPrice = DB::table('smartag_market.tbl_items_sale_price_for_customer_zone_wise')
+                    ->where('item_cd', $item['item_cd'])
+                    ->value('actual_sale_price_per_1kg');
+                // Check if the quantity is in grams and convert it to kilograms if needed
+                $quantityInKg = ($item['qty_unit'] === 'gm')
+                    ? $item['item_quantity'] / 1000
+                    : $item['item_quantity'];
+                // Calculate total price
+                $totalPrice = $itemPrice * $quantityInKg;
+                $priceList[] = array_merge($item, [
+                    'price_per_kg' => $itemPrice,
+                    'total_price' => $totalPrice,
+                ]);
+            }
+            // dd($priceList);
+            return view('admin.freshleeMarket.itemBill', [
+                'cust_id' => $cust_id,
+                'cust_name' => $cust_name,
+                'cust_phone' => $cust_phone,
+                'booking_id' => $booking_id,
+                'priceList' => $priceList,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return view('errors.generic');
+        }
+    }
+
+    public function markAsDelivered(Request $request)
+    {
+        Log::info($request->all());
+        $bookingId = $request->input('booking_id');
+        $itemCds = $request->input('item_cds');
+
+        if (empty($itemCds)) {
+            return response()->json(['message' => 'No items selected.'], 400);
+        }
+
+        foreach ($itemCds as $itemCd) {
+            DB::table('smartag_market.tbl_customer_booking_details')
+                ->where('item_cd', $itemCd)
+                ->where('booking_ref_no', $bookingId)
+                ->update(['is_delivered' => 'Y']);
+        }
+
+        return response()->json(['message' => 'Selected items marked as delivered successfully.']);
+    }
 }

@@ -75,6 +75,7 @@
                         <th>Ordered Date</th>
                         <th>Item + Quantity</th>
                         <th>Order Status</th>
+                        <th>Billing</th>
                         <th style="display: none;">Order Info</th>
                         <th>Delivery Status</th>
                     </tr>
@@ -105,6 +106,21 @@
                             </td>
                             <td style="overflow-wrap: break-word; white-space: normal;">
                                 {{ $item->is_delivered == 'Y' ? 'Delivered' : 'Pending' }}
+                            </td>
+                            <td>
+                                <form action="{{ route('order.billing') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="cust_id" value="{{ $item->cust_id }}" id="cust_id">
+                                    <input type="hidden" name="cust_name" value="{{ $item->full_name }}" id="cust_name">
+                                    <input type="hidden" name="cust_phone" value="{{ $item->phone_no }}" id="cust_phone">
+                                    <input type="hidden" name="booking_id" value="{{ $item->booking_ref_no }}"
+                                        id="booking_id">
+                                    <input type="hidden" name="order_items" value="{{ $item->order_items }}"
+                                        id="order_items">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        <i class='bx bx-add-to-queue'></i> Generate
+                                    </button>
+                                </form>
                             </td>
                             <td style="display: none; overflow-wrap: break-word; white-space: normal;">
                                 {{ $item->booking_ref_no }}
